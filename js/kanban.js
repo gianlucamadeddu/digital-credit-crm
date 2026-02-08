@@ -9,6 +9,8 @@ var statiList = [];       // Array stati ordinati
 var leadList = [];        // Array lead correnti
 var consulentiList = [];  // Array consulenti (per filtro e assegnazione)
 var sortableInstances = []; // Istanze SortableJS
+var modalitaSelezione = false; // Modalità selezione multipla
+var leadSelezionati = [];      // ID lead selezionati
 
 // ============================================
 // INIZIALIZZAZIONE
@@ -48,6 +50,11 @@ document.addEventListener('DOMContentLoaded', async function () {
 
   // Event listeners
   inizializzaEventListeners();
+
+  // Chiudi menu contestuale cliccando fuori
+  document.addEventListener('click', function () {
+    chiudiTuttiMenu();
+  });
 });
 
 // ============================================
@@ -260,7 +267,8 @@ function renderizzaKanban() {
       ghostClass: 'kanban-card-ghost',
       chosenClass: 'kanban-card-chosen',
       dragClass: 'kanban-card-drag',
-      filter: '.kanban-empty',
+      filter: '.kanban-empty,.kanban-card-menu-btn,.kanban-card-menu,.kanban-card-checkbox',
+      preventOnFilter: false,
       onEnd: function (evt) {
         gestisciDrop(evt);
       }
@@ -303,22 +311,293 @@ function creaCardLead(lead, coloreStato) {
     prioritaHtml = '<span class="badge badge-priority-high">Alta</span>';
   }
 
+  // Checkbox per selezione multipla (nascosta di default)
+  var checkboxHtml =
+    '<input type="checkbox" class="kanban-card-checkbox" data-lead-id="' + lead.id + '" ' +
+    'style="display:' + (modalitaSelezione ? 'block' : 'none') + ';" ' +
+    (leadSelezionati.indexOf(lead.id) >= 0 ? 'checked' : '') + '>';
+
+  // Bottone 3 puntini (menu contestuale)
+  var menuBtnHtml =
+    '<button class="kanban-card-menu-btn" data-lead-id="' + lead.id + '" title="Azioni">' +
+      '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/></svg>' +
+    '</button>';
+
+  // Menu dropdown
+  var menuHtml =
+    '<div class="kanban-card-menu" id="menu-' + lead.id + '">' +
+      '<div class="kanban-card-menu-item" data-azione="dettaglio" data-lead-id="' + lead.id + '">' +
+        '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>' +
+        ' Apri dettaglio' +
+      '</div>' +
+      '<div class="kanban-card-menu-item menu-item-danger" data-azione="elimina" data-lead-id="' + lead.id + '">' +
+        '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>' +
+        ' Elimina' +
+      '</div>' +
+    '</div>';
+
   card.innerHTML =
+    checkboxHtml +
     '<div class="kanban-card-top">' +
       '<span class="kanban-card-name">' + (lead.nome || '') + ' ' + (lead.cognome || '') + '</span>' +
-      prioritaHtml +
+      '<div class="kanban-card-top-right">' +
+        prioritaHtml +
+        menuBtnHtml +
+      '</div>' +
     '</div>' +
     autoHtml +
     '<div class="kanban-card-bottom">' +
       '<span class="kanban-card-date">' + dataCreazione + '</span>' +
-    '</div>';
+    '</div>' +
+    menuHtml;
 
-  // Clic per aprire dettaglio
-  card.addEventListener('click', function () {
-    window.location.href = 'lead-dettaglio.html?id=' + lead.id;
+  // Event: bottone 3 puntini
+  var menuBtn = card.querySelector('.kanban-card-menu-btn');
+  menuBtn.addEventListener('click', function (e) {
+    e.stopPropagation();
+    chiudiTuttiMenu();
+    var menu = document.getElementById('menu-' + lead.id);
+    if (menu) menu.classList.toggle('menu-visible');
+  });
+
+  // Event: voci del menu
+  var menuItems = card.querySelectorAll('.kanban-card-menu-item');
+  menuItems.forEach(function(item) {
+    item.addEventListener('click', function (e) {
+      e.stopPropagation();
+      var azione = this.dataset.azione;
+      var id = this.dataset.leadId;
+      chiudiTuttiMenu();
+
+      if (azione === 'dettaglio') {
+        window.location.href = 'lead-dettaglio.html?id=' + id;
+      } else if (azione === 'elimina') {
+        apriModaleConfermaElimina([id]);
+      }
+    });
+  });
+
+  // Event: checkbox
+  var checkbox = card.querySelector('.kanban-card-checkbox');
+  checkbox.addEventListener('click', function (e) {
+    e.stopPropagation();
+  });
+  checkbox.addEventListener('change', function (e) {
+    var id = this.dataset.leadId;
+    if (this.checked) {
+      if (leadSelezionati.indexOf(id) < 0) leadSelezionati.push(id);
+    } else {
+      leadSelezionati = leadSelezionati.filter(function(s) { return s !== id; });
+    }
+    aggiornaBarraSelezione();
+  });
+
+  // Clic per aprire dettaglio (solo se non in modalità selezione)
+  card.addEventListener('click', function (e) {
+    // Non navigare se clicco su menu, checkbox o bottoni
+    if (e.target.closest('.kanban-card-menu-btn') || e.target.closest('.kanban-card-menu') || e.target.closest('.kanban-card-checkbox')) return;
+
+    if (modalitaSelezione) {
+      // In modalità selezione, clicca per selezionare/deselezionare
+      var cb = card.querySelector('.kanban-card-checkbox');
+      cb.checked = !cb.checked;
+      cb.dispatchEvent(new Event('change'));
+    } else {
+      window.location.href = 'lead-dettaglio.html?id=' + lead.id;
+    }
   });
 
   return card;
+}
+
+// ============================================
+// MENU CONTESTUALE: Chiudi tutti
+// ============================================
+
+function chiudiTuttiMenu() {
+  var menus = document.querySelectorAll('.kanban-card-menu.menu-visible');
+  menus.forEach(function(m) { m.classList.remove('menu-visible'); });
+}
+
+// ============================================
+// MODALITÀ SELEZIONE MULTIPLA
+// ============================================
+
+function attivaModalitaSelezione() {
+  modalitaSelezione = true;
+  leadSelezionati = [];
+
+  // Mostra tutte le checkbox
+  var checkboxes = document.querySelectorAll('.kanban-card-checkbox');
+  checkboxes.forEach(function(cb) {
+    cb.style.display = 'block';
+    cb.checked = false;
+  });
+
+  // Mostra barra selezione
+  document.getElementById('barra-selezione').style.display = 'flex';
+
+  // Aggiorna testo
+  aggiornaBarraSelezione();
+}
+
+function disattivaModalitaSelezione() {
+  modalitaSelezione = false;
+  leadSelezionati = [];
+
+  // Nascondi tutte le checkbox
+  var checkboxes = document.querySelectorAll('.kanban-card-checkbox');
+  checkboxes.forEach(function(cb) {
+    cb.style.display = 'none';
+    cb.checked = false;
+  });
+
+  // Nascondi barra selezione
+  document.getElementById('barra-selezione').style.display = 'none';
+}
+
+function selezionaTutti() {
+  leadSelezionati = [];
+  var checkboxes = document.querySelectorAll('.kanban-card-checkbox');
+  checkboxes.forEach(function(cb) {
+    cb.checked = true;
+    leadSelezionati.push(cb.dataset.leadId);
+  });
+  aggiornaBarraSelezione();
+}
+
+function deselezionaTutti() {
+  leadSelezionati = [];
+  var checkboxes = document.querySelectorAll('.kanban-card-checkbox');
+  checkboxes.forEach(function(cb) {
+    cb.checked = false;
+  });
+  aggiornaBarraSelezione();
+}
+
+function aggiornaBarraSelezione() {
+  var testo = document.getElementById('selezione-conteggio');
+  if (testo) {
+    if (leadSelezionati.length === 0) {
+      testo.textContent = 'Nessun lead selezionato';
+    } else if (leadSelezionati.length === 1) {
+      testo.textContent = '1 lead selezionato';
+    } else {
+      testo.textContent = leadSelezionati.length + ' lead selezionati';
+    }
+  }
+
+  // Abilita/disabilita bottone elimina
+  var btnElimina = document.getElementById('btn-elimina-selezionati');
+  if (btnElimina) {
+    btnElimina.disabled = leadSelezionati.length === 0;
+  }
+}
+
+// ============================================
+// ELIMINAZIONE LEAD
+// ============================================
+
+function apriModaleConfermaElimina(leadIds) {
+  var modal = document.getElementById('modal-conferma-elimina');
+  var testo = document.getElementById('elimina-testo-conferma');
+
+  if (leadIds.length === 1) {
+    // Trova nome del lead
+    var lead = null;
+    for (var i = 0; i < leadList.length; i++) {
+      if (leadList[i].id === leadIds[0]) { lead = leadList[i]; break; }
+    }
+    var nomeLead = lead ? (lead.nome + ' ' + lead.cognome) : 'questo lead';
+    testo.innerHTML = 'Sei sicuro di voler eliminare <strong>' + nomeLead + '</strong>?<br><span style="color:#6B7280;font-size:0.8rem;">Verranno eliminati anche timeline, documenti e richieste BO associati.</span>';
+  } else {
+    testo.innerHTML = 'Sei sicuro di voler eliminare <strong>' + leadIds.length + ' lead</strong>?<br><span style="color:#6B7280;font-size:0.8rem;">Verranno eliminati anche timeline, documenti e richieste BO associati.</span>';
+  }
+
+  // Salva gli ID da eliminare sul bottone conferma
+  document.getElementById('btn-conferma-elimina').dataset.leadIds = JSON.stringify(leadIds);
+
+  modal.style.display = 'flex';
+}
+
+function chiudiModaleConfermaElimina() {
+  document.getElementById('modal-conferma-elimina').style.display = 'none';
+}
+
+async function eliminaLeadConfermato() {
+  var btn = document.getElementById('btn-conferma-elimina');
+  var leadIds = JSON.parse(btn.dataset.leadIds || '[]');
+
+  if (leadIds.length === 0) return;
+
+  // Disabilita bottone
+  btn.disabled = true;
+  btn.textContent = 'Eliminazione...';
+
+  var eliminati = 0;
+  var errori = 0;
+
+  for (var i = 0; i < leadIds.length; i++) {
+    try {
+      await eliminaLeadCompleto(leadIds[i]);
+      eliminati++;
+    } catch (error) {
+      console.log('Errore eliminazione lead ' + leadIds[i] + ':', error);
+      errori++;
+    }
+  }
+
+  // Chiudi modale
+  chiudiModaleConfermaElimina();
+
+  // Ripristina bottone
+  btn.disabled = false;
+  btn.innerHTML =
+    '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>' +
+    ' Elimina';
+
+  // Disattiva modalità selezione
+  if (modalitaSelezione) disattivaModalitaSelezione();
+
+  // Mostra risultato
+  if (errori === 0) {
+    if (eliminati === 1) {
+      mostraToast('Lead eliminato con successo', 'success');
+    } else {
+      mostraToast(eliminati + ' lead eliminati con successo', 'success');
+    }
+  } else {
+    mostraToast('Eliminati ' + eliminati + ' lead, ' + errori + ' errori', 'warning');
+  }
+
+  // Ricarica board
+  await caricaEFiltraLead();
+}
+
+// Elimina un lead e tutte le sue subcollection
+async function eliminaLeadCompleto(leadId) {
+  var leadRef = db.collection('lead').doc(leadId);
+
+  // 1. Elimina subcollection timeline
+  var timelineSnap = await leadRef.collection('timeline').get();
+  var batch1 = db.batch();
+  timelineSnap.forEach(function(doc) { batch1.delete(doc.ref); });
+  if (!timelineSnap.empty) await batch1.commit();
+
+  // 2. Elimina subcollection documenti
+  var docSnap = await leadRef.collection('documenti').get();
+  var batch2 = db.batch();
+  docSnap.forEach(function(doc) { batch2.delete(doc.ref); });
+  if (!docSnap.empty) await batch2.commit();
+
+  // 3. Elimina subcollection richiesteBO
+  var boSnap = await leadRef.collection('richiesteBO').get();
+  var batch3 = db.batch();
+  boSnap.forEach(function(doc) { batch3.delete(doc.ref); });
+  if (!boSnap.empty) await batch3.commit();
+
+  // 4. Elimina il documento lead
+  await leadRef.delete();
 }
 
 // ============================================
@@ -394,7 +673,6 @@ async function gestisciDrop(evt) {
   } catch (error) {
     console.log('Errore aggiornamento stato:', error);
     mostraToast("Errore nell'aggiornamento dello stato", 'error');
-    // Ricarica la board per tornare allo stato corretto
     await caricaEFiltraLead();
   }
 }
@@ -434,13 +712,11 @@ async function salvaLead() {
   var autoRichiesta = document.getElementById('nuovo-auto').value.trim();
   var priorita = document.getElementById('nuovo-priorita').value;
 
-  // Validazione
   if (!nome || !cognome || !telefono) {
     mostraToast('Compila i campi obbligatori: Nome, Cognome, Telefono', 'error');
     return;
   }
 
-  // Determina consulente
   var consulenteId = '';
   if (utenteCorrente.ruolo === 'admin') {
     consulenteId = document.getElementById('nuovo-consulente').value || '';
@@ -448,7 +724,6 @@ async function salvaLead() {
     consulenteId = utenteCorrente.id;
   }
 
-  // Disabilita bottone
   var btnSalva = document.getElementById('btn-salva-lead');
   btnSalva.disabled = true;
   btnSalva.textContent = 'Salvataggio...';
@@ -481,7 +756,6 @@ async function salvaLead() {
 
     var docRef = await db.collection('lead').add(nuovoLead);
 
-    // Crea voce timeline
     await db.collection('lead').doc(docRef.id).collection('timeline').add({
       tipo: 'cambio_stato',
       statoOld: '',
@@ -494,8 +768,6 @@ async function salvaLead() {
 
     mostraToast('Lead creato con successo!', 'success');
     chiudiModaleNuovoLead();
-
-    // Ricarica board
     await caricaEFiltraLead();
 
   } catch (error) {
@@ -517,7 +789,7 @@ function inizializzaEventListeners() {
   // Bottone nuovo lead
   document.getElementById('btn-nuovo-lead').addEventListener('click', apriModaleNuovoLead);
 
-  // Chiudi modale
+  // Chiudi modale nuovo lead
   document.getElementById('btn-chiudi-modale').addEventListener('click', chiudiModaleNuovoLead);
   document.getElementById('btn-annulla-lead').addEventListener('click', chiudiModaleNuovoLead);
 
@@ -558,6 +830,32 @@ function inizializzaEventListeners() {
       logout();
     });
   }
+
+  // --- SELEZIONE MULTIPLA ---
+  document.getElementById('btn-modalita-selezione').addEventListener('click', function () {
+    if (modalitaSelezione) {
+      disattivaModalitaSelezione();
+    } else {
+      attivaModalitaSelezione();
+    }
+  });
+
+  document.getElementById('btn-seleziona-tutti').addEventListener('click', selezionaTutti);
+  document.getElementById('btn-deseleziona-tutti').addEventListener('click', deselezionaTutti);
+  document.getElementById('btn-annulla-selezione').addEventListener('click', disattivaModalitaSelezione);
+
+  document.getElementById('btn-elimina-selezionati').addEventListener('click', function () {
+    if (leadSelezionati.length > 0) {
+      apriModaleConfermaElimina(leadSelezionati);
+    }
+  });
+
+  // --- MODALE CONFERMA ELIMINA ---
+  document.getElementById('btn-conferma-elimina').addEventListener('click', eliminaLeadConfermato);
+  document.getElementById('btn-annulla-elimina').addEventListener('click', chiudiModaleConfermaElimina);
+  document.getElementById('modal-conferma-elimina').addEventListener('click', function (e) {
+    if (e.target === this) chiudiModaleConfermaElimina();
+  });
 }
 
 // ============================================
