@@ -4,7 +4,6 @@
 // ============================================
 
 // Riferimenti globali
-const db = firebase.firestore();
 let utenteCorrente = null;
 let statiList = [];       // Array stati ordinati
 let leadList = [];        // Array lead correnti
