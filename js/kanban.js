@@ -256,10 +256,6 @@ function renderizzaKanban() {
       cardContainer.appendChild(empty);
     }
 
-    var r = parseInt(stato.colore.substring(1,3), 16);
-    var g = parseInt(stato.colore.substring(3,5), 16);
-    var b = parseInt(stato.colore.substring(5,7), 16);
-    header.style.background = 'rgba(' + r + ',' + g + ',' + b + ',0.12)';
     colonna.appendChild(header);
     colonna.appendChild(cardContainer);
     board.appendChild(colonna);
