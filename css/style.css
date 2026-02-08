@@ -1460,7 +1460,7 @@ textarea.form-input {
 
 /* --- Colonna Kanban --- */
 .kanban-column {
-  min-width: 260px;
+  min-width: 180px;
   max-width: 300px;
   flex: 1 0 260px;
   background: var(--bg-page);
