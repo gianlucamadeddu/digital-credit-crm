@@ -2,10 +2,7 @@
 // lead.js — Logica Elenco Lead + Dettaglio Lead
 // ============================================
 
-// Variabili globali — usa db già dichiarato in firebase-config.js
-if (typeof db === 'undefined') var db = firebase.firestore();
-if (typeof storage === 'undefined') var storage = firebase.storage();
-
+// Usa db e storage già dichiarati in firebase-config.js
 // Stato elenco
 var tuttiLead = [];
 var leadFiltrati = [];
