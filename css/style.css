@@ -1715,3 +1715,178 @@ textarea.form-input {
     display: none;
   }
 }
+
+/* ============================================
+   AGGIUNGI QUESTO CODICE ALLA FINE DI style.css
+   Stili per: Menu contestuale card, Selezione multipla, Eliminazione
+   ============================================ */
+
+/* --- MENU CONTESTUALE CARD (3 puntini) --- */
+
+.kanban-card-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.kanban-card-top-right {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.kanban-card-menu-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 2px 4px;
+  border-radius: 4px;
+  color: #9CA3AF;
+  opacity: 0;
+  transition: opacity 0.2s, background 0.2s, color 0.2s;
+  line-height: 1;
+}
+
+.kanban-card:hover .kanban-card-menu-btn {
+  opacity: 1;
+}
+
+.kanban-card-menu-btn:hover {
+  background: #F3F4F6;
+  color: #374151;
+}
+
+.kanban-card-menu {
+  display: none;
+  position: absolute;
+  right: 8px;
+  top: 36px;
+  background: white;
+  border: 1px solid #E5E7EB;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+  min-width: 160px;
+  z-index: 100;
+  overflow: hidden;
+}
+
+.kanban-card-menu.menu-visible {
+  display: block;
+}
+
+.kanban-card-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  font-size: 0.8125rem;
+  color: #374151;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.kanban-card-menu-item:hover {
+  background: #F3F4F6;
+}
+
+.kanban-card-menu-item.menu-item-danger {
+  color: #EF4444;
+}
+
+.kanban-card-menu-item.menu-item-danger:hover {
+  background: #FEF2F2;
+}
+
+/* Card deve essere position relative per il menu */
+.kanban-card {
+  position: relative;
+}
+
+/* --- CHECKBOX SELEZIONE MULTIPLA --- */
+
+.kanban-card-checkbox {
+  position: absolute;
+  top: 10px;
+  left: -4px;
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+  accent-color: #E63946;
+  z-index: 10;
+}
+
+/* Quando checkbox visibile, sposta contenuto card */
+.kanban-card-checkbox[style*="display: block"] ~ .kanban-card-top {
+  margin-left: 20px;
+}
+
+.kanban-card-checkbox[style*="display: block"] ~ .kanban-card-auto {
+  margin-left: 20px;
+}
+
+.kanban-card-checkbox[style*="display: block"] ~ .kanban-card-bottom {
+  margin-left: 20px;
+}
+
+/* --- BARRA SELEZIONE MULTIPLA --- */
+
+.barra-selezione {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 24px;
+  background: #FEF3C7;
+  border-bottom: 1px solid #FCD34D;
+  animation: slideDown 0.2s ease-out;
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.barra-selezione-left {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #92400E;
+}
+
+.barra-selezione-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* --- BOTTONI SM (piccoli, per barra selezione) --- */
+
+.btn-sm {
+  padding: 4px 12px;
+  font-size: 0.75rem;
+}
+
+/* --- BOTTONE DANGER (rosso) --- */
+
+.btn-danger {
+  background: #EF4444;
+  color: white;
+  border: 1px solid #EF4444;
+}
+
+.btn-danger:hover {
+  background: #DC2626;
+  border-color: #DC2626;
+}
+
+.btn-danger:disabled {
+  background: #FCA5A5;
+  border-color: #FCA5A5;
+  cursor: not-allowed;
+}
+
+/* --- MODALE PICCOLA (conferma eliminazione) --- */
+
+.modal-sm {
+  max-width: 440px;
+}
