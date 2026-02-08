@@ -256,6 +256,7 @@ function renderizzaKanban() {
       cardContainer.appendChild(empty);
     }
 
+    header.style.background = stato.colore + '18';
     colonna.appendChild(header);
     colonna.appendChild(cardContainer);
     board.appendChild(colonna);
