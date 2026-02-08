@@ -256,9 +256,7 @@ function renderizzaKanban() {
       cardContainer.appendChild(empty);
     }
 
-    header.style.backgroundColor = stato.colore;
-    header.style.opacity = '1';
-    header.style.background = 'linear-gradient(to right, ' + stato.colore + '22, ' + stato.colore + '08)';
+    header.style.cssText = 'background:' + stato.colore + '20 !important; padding:var(--space-4); border-bottom:1px solid var(--border-color);';
     colonna.appendChild(header);
     colonna.appendChild(cardContainer);
     board.appendChild(colonna);
