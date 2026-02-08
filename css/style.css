@@ -1700,7 +1700,7 @@ textarea.form-input {
 /* --- Responsive Kanban --- */
 @media (max-width: 1024px) {
   .kanban-column {
-    min-width: 220px;
+    min-width: 180px;
   }
 
   .sidebar-footer .sidebar-item span {
