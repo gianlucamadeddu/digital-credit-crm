@@ -594,27 +594,3 @@ function mostraToast(messaggio, tipo = 'info') {
   }, 3000);
 }
 
-// ============================================
-// FUNZIONI AUTH (fallback se auth.js non le ha)
-// ============================================
-
-function getUtenteCorrente() {
-  if (typeof window.getUtenteCorrente === 'function' && window.getUtenteCorrente !== getUtenteCorrente) {
-    return window.getUtenteCorrente();
-  }
-  const dati = sessionStorage.getItem('utente');
-  if (!dati) return null;
-  try {
-    return JSON.parse(dati);
-  } catch (e) {
-    return null;
-  }
-}
-
-function logout() {
-  if (typeof window.logout === 'function' && window.logout !== logout) {
-    return window.logout();
-  }
-  sessionStorage.removeItem('utente');
-  window.location.href = 'index.html';
-}
