@@ -337,3 +337,21 @@ function inizializzaSidebar() {
     userInfo.textContent = utente.nome + ' ' + utente.cognome;
   }
 }
+
+// --- INIZIALIZZA SIDEBAR ---
+function inizializzaSidebar() {
+  // Usa setupHeaderUtente già presente in auth.js
+  setupHeaderUtente();
+
+  // Evidenzia la pagina corrente nel menu
+  var pagina = window.location.pathname.split('/').pop() || 'dashboard.html';
+  var menuItems = document.querySelectorAll('.sidebar-item');
+  menuItems.forEach(function(item) {
+    var href = item.getAttribute('href');
+    if (href && href === pagina) {
+      item.classList.add('active');
+    } else {
+      item.classList.remove('active');
+    }
+  });
+}
