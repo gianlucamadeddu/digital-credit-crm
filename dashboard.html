@@ -3,126 +3,222 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashboard - Digital Credit CRM</title>
+  <title>Dashboard - Digital Credit</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-  
   <div class="app-container">
-    
-    <!-- SIDEBAR -->
-    <aside class="sidebar">
-     <div class="sidebar-logo">
-       <img src="assets/logo.png" alt="Digital Credit" style="height: 120px; width: auto; padding: 10px; background: white; border-radius: 8px;">
+
+    <!-- ========== SIDEBAR ========== -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-logo">
+        <img src="assets/logo.png" alt="Digital Credit" height="40" onerror="this.style.display='none';this.nextElementSibling.style.display='block';">
+        <span class="sidebar-logo-text" style="display:none;color:#fff;font-size:1.25rem;font-weight:700;">DIGITAL<span style="color:var(--brand-primary);"> CREDIT</span></span>
       </div>
-      
+
       <div class="sidebar-section-title">Menu Principale</div>
-      
       <nav class="sidebar-nav">
+        <!-- 1. Dashboard -->
         <a href="dashboard.html" class="sidebar-item active">
-          <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+          <svg class="sidebar-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
           <span>Dashboard</span>
         </a>
-        <a href="lead-kanban.html" class="sidebar-item" data-ruolo="consulente">
-          <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        <!-- 2. Lead -->
+        <a href="lead-kanban.html" class="sidebar-item">
+          <svg class="sidebar-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
           <span>Lead</span>
         </a>
+        <!-- 3. Agenda -->
         <a href="agenda.html" class="sidebar-item">
-          <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          <svg class="sidebar-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
           <span>Agenda</span>
         </a>
-        <a href="backoffice.html" class="sidebar-item" data-ruolo="backoffice">
-          <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+        <!-- 4. Template Messaggi -->
+        <a href="template.html" class="sidebar-item">
+          <svg class="sidebar-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          <span>Template Messaggi</span>
+        </a>
+        <!-- 5. Back Office -->
+        <a href="backoffice.html" class="sidebar-item" id="menu-backoffice">
+          <svg class="sidebar-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><line x1="10" y1="9" x2="8" y2="9"/></svg>
           <span>Back Office</span>
         </a>
+        <!-- 6. Comunicazioni -->
         <a href="comunicazioni.html" class="sidebar-item">
-          <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+          <svg class="sidebar-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
           <span>Comunicazioni</span>
+          <span class="badge-notification" id="sidebar-badge-comunicazioni" style="display:none;">0</span>
         </a>
-        <a href="report.html" class="sidebar-item" data-ruolo="admin">
-          <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+        <!-- 7. Report -->
+        <a href="report.html" class="sidebar-item">
+          <svg class="sidebar-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
           <span>Report</span>
         </a>
       </nav>
-      
-      <div class="sidebar-section-title" data-ruolo="admin">Amministrazione</div>
-      
+
+      <div class="sidebar-section-title" id="section-admin">Amministrazione</div>
       <nav class="sidebar-nav">
-        <a href="impostazioni.html" class="sidebar-item" data-ruolo="admin">
-          <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        <!-- 8. Impostazioni -->
+        <a href="impostazioni.html" class="sidebar-item" id="menu-impostazioni">
+          <svg class="sidebar-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
           <span>Impostazioni</span>
         </a>
       </nav>
-      
-      <!-- Logout in fondo alla sidebar -->
-      <div class="sidebar-bottom">
-        <a href="#" class="sidebar-item" id="btn-logout">
-          <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-          <span>Esci</span>
-        </a>
+
+      <!-- Utente in fondo alla sidebar -->
+      <div class="sidebar-user">
+        <div class="sidebar-user-info">
+          <div class="sidebar-user-name" id="sidebar-user-name">—</div>
+          <div class="sidebar-user-role" id="sidebar-user-role">—</div>
+        </div>
+        <button class="sidebar-logout-btn" id="btn-logout" title="Esci">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        </button>
       </div>
     </aside>
-    
-    <!-- CONTENUTO PRINCIPALE -->
+
+    <!-- ========== CONTENUTO PRINCIPALE ========== -->
     <main class="main-content">
-      
+
       <!-- Header pagina -->
       <header class="page-header">
-        <h1 class="page-title">Dashboard</h1>
+        <div class="page-header-left">
+          <h1 class="page-title">Dashboard</h1>
+          <p class="page-subtitle" id="page-subtitle">Panoramica generale</p>
+        </div>
         <div class="page-header-right">
-          <div class="header-user-info">
-            <div class="header-user-details">
-              <span class="nome" id="header-nome-utente">—</span>
-              <span class="ruolo" id="header-ruolo">—</span>
-            </div>
-            <div class="header-avatar" id="header-avatar">—</div>
-          </div>
+          <!-- Selettore periodo -->
+          <select class="form-select form-select-sm" id="select-periodo">
+            <option value="mese" selected>Questo mese</option>
+            <option value="trimestre">Ultimi 3 mesi</option>
+            <option value="anno">Quest'anno</option>
+            <option value="tutto">Tutto</option>
+          </select>
         </div>
       </header>
-      
+
       <!-- Contenuto -->
       <div class="page-content fade-in">
-        
-        <div class="card" style="max-width: 600px; margin: var(--space-10) auto; text-align: center;">
-          <div style="font-size: 48px; margin-bottom: var(--space-4);">🎉</div>
-          <h2 style="font-size: var(--text-xl); margin-bottom: var(--space-3);">Login riuscito!</h2>
-          <p style="color: var(--text-secondary); margin-bottom: var(--space-4);">
-            La dashboard completa sarà sviluppata nella <strong>Chat 02</strong>.<br>
-            Per ora il login e l'autenticazione funzionano correttamente.
-          </p>
-          <p style="color: var(--text-muted); font-size: var(--text-sm);">
-            Puoi testare il logout cliccando "Esci" nella sidebar.
-          </p>
+
+        <!-- ===== RIGA 1 — 4 WIDGET ===== -->
+        <div class="widget-grid" id="widget-grid">
+          <!-- Widget 1: Lead Totali -->
+          <div class="card card-widget" id="widget-lead-totali" style="cursor:pointer;">
+            <div class="card-widget-icon blue">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            </div>
+            <div>
+              <div class="card-widget-number" id="num-lead-totali">
+                <span class="skeleton skeleton-number">&nbsp;</span>
+              </div>
+              <div class="card-widget-label">Lead Totali</div>
+            </div>
+          </div>
+
+          <!-- Widget 2: Appuntamenti Oggi -->
+          <div class="card card-widget" id="widget-appuntamenti" style="cursor:pointer;">
+            <div class="card-widget-icon red">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            </div>
+            <div>
+              <div class="card-widget-number" id="num-appuntamenti">
+                <span class="skeleton skeleton-number">&nbsp;</span>
+              </div>
+              <div class="card-widget-label">Appuntamenti Oggi</div>
+            </div>
+          </div>
+
+          <!-- Widget 3: Contratti Firmati -->
+          <div class="card card-widget" id="widget-contratti" style="cursor:pointer;">
+            <div class="card-widget-icon green">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+            </div>
+            <div>
+              <div class="card-widget-number" id="num-contratti">
+                <span class="skeleton skeleton-number">&nbsp;</span>
+              </div>
+              <div class="card-widget-label">Contratti Firmati</div>
+            </div>
+          </div>
+
+          <!-- Widget 4: Lead Nuovi -->
+          <div class="card card-widget" id="widget-lead-nuovi" style="cursor:pointer;">
+            <div class="card-widget-icon yellow">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+            </div>
+            <div>
+              <div class="card-widget-number" id="num-lead-nuovi">
+                <span class="skeleton skeleton-number">&nbsp;</span>
+              </div>
+              <div class="card-widget-label">Lead Nuovi</div>
+            </div>
+          </div>
         </div>
-        
+
+        <!-- ===== RIGA 2 — DUE COLONNE ===== -->
+        <div class="two-columns">
+
+          <!-- COLONNA SINISTRA — Clienti Recenti -->
+          <div class="card">
+            <div class="section-header">
+              <svg class="section-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+              <h2 class="section-title">Clienti Recenti</h2>
+            </div>
+            <div class="client-list" id="lista-clienti-recenti">
+              <!-- Skeleton loading -->
+              <div class="client-list-item skeleton-row"><div class="skeleton" style="width:60%;height:16px;border-radius:4px;">&nbsp;</div></div>
+              <div class="client-list-item skeleton-row"><div class="skeleton" style="width:50%;height:16px;border-radius:4px;">&nbsp;</div></div>
+              <div class="client-list-item skeleton-row"><div class="skeleton" style="width:55%;height:16px;border-radius:4px;">&nbsp;</div></div>
+            </div>
+          </div>
+
+          <!-- COLONNA DESTRA -->
+          <div>
+            <!-- Card Appuntamenti Oggi -->
+            <div class="card" style="margin-bottom: var(--space-4);">
+              <div class="section-header">
+                <svg class="section-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                <h2 class="section-title">Appuntamenti Oggi</h2>
+              </div>
+              <div id="lista-appuntamenti-oggi">
+                <!-- Skeleton loading -->
+                <div class="skeleton-row"><div class="skeleton" style="width:70%;height:14px;border-radius:4px;">&nbsp;</div></div>
+              </div>
+            </div>
+
+            <!-- Card Comunicazioni -->
+            <div class="card">
+              <div class="section-header">
+                <svg class="section-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+                <h2 class="section-title">Comunicazioni</h2>
+                <span class="badge-notification" id="badge-comunicazioni" style="display:none;">0</span>
+              </div>
+              <div id="lista-comunicazioni">
+                <div class="skeleton-row"><div class="skeleton" style="width:65%;height:14px;border-radius:4px;">&nbsp;</div></div>
+              </div>
+            </div>
+          </div>
+
+        </div>
       </div>
     </main>
-    
+
   </div>
-  
-  <!-- Firebase SDK -->
+
+  <!-- Toast notifica -->
+  <div id="toast-container" class="toast-container"></div>
+
+  <!-- Firebase CDN -->
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js"></script>
-  
+
   <!-- Script progetto -->
   <script src="js/firebase-config.js"></script>
-  <script src="js/utils.js"></script>
   <script src="js/auth.js"></script>
-  
-  <script>
-    // Proteggi pagina - tutti i ruoli possono accedere alla dashboard
-    var utente = proteggPagina(['admin', 'consulente', 'backoffice']);
-    
-    if (utente) {
-      // Setup header con dati utente
-      setupHeaderUtente();
-      console.log('✅ Dashboard caricata per:', utente.nomeCompleto, '(' + utente.ruolo + ')');
-    }
-  </script>
-  
+  <script src="js/utils.js"></script>
+  <script src="js/dashboard.js"></script>
 </body>
 </html>
