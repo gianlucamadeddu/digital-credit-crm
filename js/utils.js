@@ -257,3 +257,83 @@ function mostraEmptyState(container, icona, messaggio) {
 function logDebug(contesto, ...args) {
   console.log(`[${contesto}]`, ...args);
 }
+
+// ============================================
+// AGGIUNGI QUESTO IN FONDO AL TUO utils.js
+// ============================================
+
+/**
+ * Inizializza la sidebar: evidenzia la pagina corrente,
+ * mostra/nasconde voci menu in base al ruolo utente
+ */
+function inizializzaSidebar() {
+  var utente = getUtenteCorrente();
+  if (!utente) return;
+
+  // 1. Evidenzia la voce di menu della pagina corrente
+  var paginaCorrente = window.location.pathname.split('/').pop() || 'dashboard.html';
+  var menuItems = document.querySelectorAll('.sidebar-item');
+  menuItems.forEach(function(item) {
+    var href = item.getAttribute('href');
+    if (href && href === paginaCorrente) {
+      item.classList.add('active');
+    } else {
+      item.classList.remove('active');
+    }
+  });
+
+  // 2. Mostra/nascondi voci in base al ruolo
+  var ruolo = utente.ruolo;
+
+  // Sezione admin (impostazioni, report, backoffice)
+  var sectionAdmin = document.getElementById('section-admin');
+  var menuImpostazioni = document.getElementById('menu-impostazioni');
+  var menuReport = document.getElementById('menu-report');
+  var menuBackoffice = document.getElementById('menu-backoffice');
+
+  if (ruolo === 'admin') {
+    if (sectionAdmin) sectionAdmin.style.display = '';
+    if (menuImpostazioni) menuImpostazioni.style.display = '';
+    if (menuReport) menuReport.style.display = '';
+    if (menuBackoffice) menuBackoffice.style.display = '';
+  } else if (ruolo === 'backoffice') {
+    if (sectionAdmin) sectionAdmin.style.display = '';
+    if (menuImpostazioni) menuImpostazioni.style.display = 'none';
+    if (menuReport) menuReport.style.display = '';
+    if (menuBackoffice) menuBackoffice.style.display = '';
+  } else {
+    // consulente — nasconde tutto
+    if (sectionAdmin) sectionAdmin.style.display = 'none';
+    if (menuImpostazioni) menuImpostazioni.style.display = 'none';
+    if (menuReport) menuReport.style.display = 'none';
+    if (menuBackoffice) menuBackoffice.style.display = 'none';
+  }
+
+  // 3. Carica contatore comunicazioni non lette
+  var badgeCom = document.getElementById('badge-comunicazioni');
+  if (badgeCom && typeof db !== 'undefined') {
+    db.collection('comunicazioni').get().then(function(snapshot) {
+      var nonLette = 0;
+      snapshot.forEach(function(doc) {
+        var data = doc.data();
+        if (!data.lettoDa || !data.lettoDa.includes(utente.id)) {
+          nonLette++;
+        }
+      });
+      if (nonLette > 0) {
+        badgeCom.textContent = nonLette;
+        badgeCom.style.display = '';
+      } else {
+        badgeCom.style.display = 'none';
+      }
+    }).catch(function() {
+      badgeCom.style.display = 'none';
+    });
+  }
+
+  // 4. Mostra nome utente nel footer sidebar (se presente)
+  var userInfo = document.getElementById('sidebar-user-info');
+  if (userInfo) {
+    userInfo.textContent = utente.nome + ' ' + utente.cognome;
+  }
+}
