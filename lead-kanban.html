@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lead - Digital Credit</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="app-container">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-logo">
+        <img src="assets/logo.png" alt="Digital Credit" style="height: 120px; width: auto; padding: 10px; background: white; border-radius: 8px;">
+      </div>
+
+      <div class="sidebar-section-title">Menu Principale</div>
+
+      <nav class="sidebar-nav">
+        <a href="dashboard.html" class="sidebar-item">
+          <svg class="sidebar-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+          <span>Dashboard</span>
+        </a>
+        <a href="lead-kanban.html" class="sidebar-item active">
+          <svg class="sidebar-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          <span>Lead</span>
+        </a>
+        <a href="agenda.html" class="sidebar-item">
+          <svg class="sidebar-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          <span>Appuntamenti</span>
+        </a>
+        <a href="template-messaggi.html" class="sidebar-item">
+          <svg class="sidebar-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          <span>Template Messaggi</span>
+        </a>
+        <a href="comunicazioni.html" class="sidebar-item">
+          <svg class="sidebar-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+          <span>Comunicazioni</span>
+          <span class="badge-notification" id="badge-comunicazioni" style="display:none;">0</span>
+        </a>
+      </nav>
+
+      <div class="sidebar-section-title">Amministrazione</div>
+
+      <nav class="sidebar-nav">
+        <a href="report.html" class="sidebar-item">
+          <svg class="sidebar-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+          <span>Report</span>
+        </a>
+        <a href="impostazioni.html" class="sidebar-item" id="menu-impostazioni">
+          <svg class="sidebar-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          <span>Impostazioni</span>
+        </a>
+      </nav>
+
+      <!-- Utente e logout in fondo -->
+      <div class="sidebar-footer">
+        <div class="sidebar-user">
+          <div class="sidebar-user-avatar" id="user-avatar">U</div>
+          <div class="sidebar-user-info">
+            <span class="sidebar-user-name" id="user-nome">Utente</span>
+            <span class="sidebar-user-role" id="user-ruolo">Ruolo</span>
+          </div>
+        </div>
+        <a href="#" class="sidebar-item" id="btn-logout">
+          <svg class="sidebar-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          <span>Esci</span>
+        </a>
+      </div>
+    </aside>
+
+    <!-- CONTENUTO PRINCIPALE -->
+    <main class="main-content">
+
+      <!-- Header pagina -->
+      <header class="page-header">
+        <div class="page-header-row">
+          <h1 class="page-title">Lead</h1>
+        </div>
+      </header>
+
+      <!-- Toolbar -->
+      <div class="toolbar">
+        <div class="toolbar-left">
+          <!-- Toggle Kanban / Elenco -->
+          <div class="toggle-group">
+            <a href="lead-kanban.html" class="toggle-btn active">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+              Kanban
+            </a>
+            <a href="lead-elenco.html" class="toggle-btn">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+              Elenco
+            </a>
+          </div>
+
+          <!-- Filtro periodo -->
+          <div class="form-group-inline">
+            <select class="form-input form-select" id="filtro-periodo">
+              <option value="mese">Questo mese</option>
+              <option value="trimestre">Ultimi 3 mesi</option>
+              <option value="tutto" selected>Tutto</option>
+            </select>
+          </div>
+
+          <!-- Filtro consulente (solo Admin/BO) -->
+          <div class="form-group-inline" id="filtro-consulente-wrapper" style="display:none;">
+            <select class="form-input form-select" id="filtro-consulente">
+              <option value="tutti">Tutti i consulenti</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="toolbar-right">
+          <button class="btn btn-primary" id="btn-nuovo-lead">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Nuovo Lead
+          </button>
+        </div>
+      </div>
+
+      <!-- Board Kanban -->
+      <div class="page-content kanban-page-content">
+        <div class="kanban-board" id="kanban-board">
+          <!-- Le colonne verranno generate dinamicamente da kanban.js -->
+          <div class="kanban-loading">
+            <div class="skeleton" style="width:200px;height:300px;border-radius:12px;"></div>
+            <div class="skeleton" style="width:200px;height:300px;border-radius:12px;"></div>
+            <div class="skeleton" style="width:200px;height:300px;border-radius:12px;"></div>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- MODALE NUOVO LEAD -->
+  <div class="modal-overlay" id="modal-nuovo-lead" style="display:none;">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 class="modal-title">Nuovo Lead</h2>
+        <button class="btn-icon modal-close" id="btn-chiudi-modale">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form id="form-nuovo-lead">
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Nome *</label>
+              <input type="text" class="form-input" id="nuovo-nome" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Cognome *</label>
+              <input type="text" class="form-input" id="nuovo-cognome" required>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Telefono *</label>
+              <input type="tel" class="form-input" id="nuovo-telefono" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Email</label>
+              <input type="email" class="form-input" id="nuovo-email">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Auto richiesta</label>
+              <input type="text" class="form-input" id="nuovo-auto" placeholder="es. Fiat 500">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Priorità</label>
+              <select class="form-input form-select" id="nuovo-priorita">
+                <option value="bassa">Bassa</option>
+                <option value="media" selected>Media</option>
+                <option value="alta">Alta</option>
+              </select>
+            </div>
+          </div>
+          <!-- Selezione consulente: visibile solo per Admin -->
+          <div class="form-group" id="assegna-consulente-wrapper" style="display:none;">
+            <label class="form-label">Assegna a consulente</label>
+            <select class="form-input form-select" id="nuovo-consulente">
+              <option value="">-- Scegli consulente --</option>
+            </select>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" id="btn-annulla-lead">Annulla</button>
+        <button class="btn btn-primary" id="btn-salva-lead">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          Salva Lead
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST NOTIFICA -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <!-- Scripts -->
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+  <script src="js/firebase-config.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/kanban.js"></script>
+</body>
+</html>
