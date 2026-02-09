@@ -98,6 +98,12 @@
       var titoloBO = document.getElementById('titolo-sezione-bo');
       if (titoloBO) titoloBO.textContent = 'Richieste Back Office';
     }
+
+    // Per Admin: mostra card richieste BO in aggiunta
+    if (ruolo === 'admin') {
+      var cardRichiesteAdmin = document.getElementById('card-richieste-bo-admin');
+      if (cardRichiesteAdmin) cardRichiesteAdmin.style.display = '';
+    }
   }
 
   // =============================================
@@ -130,6 +136,11 @@
     caricaAppuntamentiOggi();
     caricaComunicazioni();
     caricaRisposteBO();
+
+    // Per Admin: carica anche le richieste BO pendenti
+    if (utenteCorrente.ruolo === 'admin') {
+      caricaRichiesteAdminBO();
+    }
   }
 
   // =============================================
@@ -718,6 +729,131 @@
 
     }).catch(function (errore) {
       console.log('Errore caricamento risposte BO:', errore);
+      container.innerHTML = mostraEmptyState(
+        '<svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>',
+        'Errore nel caricamento'
+      );
+    });
+  }
+
+  // --- ADMIN: Richieste BO in attesa e in lavorazione (card aggiuntiva) ---
+  function caricaRichiesteAdminBO() {
+    var container = document.getElementById('lista-richieste-bo-admin');
+    var badgeEl = document.getElementById('badge-richieste-bo-admin');
+
+    db.collection('lead').get().then(function (leadSnapshot) {
+      var promesse = [];
+      var leadMap = {};
+
+      leadSnapshot.forEach(function (doc) {
+        var leadData = doc.data();
+        var leadId = doc.id;
+        leadMap[leadId] = {
+          nome: (leadData.nome || '') + ' ' + (leadData.cognome || ''),
+          auto: leadData.autoRichiesta || ''
+        };
+
+        var p = db.collection('lead').doc(leadId)
+          .collection('richiesteBO')
+          .where('stato', 'in', ['in_attesa', 'in_lavorazione'])
+          .get()
+          .then(function (richSnap) {
+            var risultati = [];
+            richSnap.forEach(function (richDoc) {
+              var richData = richDoc.data();
+              risultati.push({
+                richiestaId: richDoc.id,
+                leadId: leadId,
+                nomeCliente: leadMap[leadId].nome,
+                tipo: richData.tipo || 'preventivo',
+                stato: richData.stato,
+                richiedenteNome: richData.richiedenteNome || '—',
+                nota: richData.nota || '',
+                dataRichiesta: richData.dataRichiesta
+              });
+            });
+            return risultati;
+          });
+
+        promesse.push(p);
+      });
+
+      return Promise.all(promesse);
+    }).then(function (risultatiArray) {
+      var richieste = [];
+      risultatiArray.forEach(function (arr) {
+        richieste = richieste.concat(arr);
+      });
+
+      // Ordina: in_attesa prima, poi per data (più vecchie prima)
+      richieste.sort(function (a, b) {
+        if (a.stato === 'in_attesa' && b.stato !== 'in_attesa') return -1;
+        if (a.stato !== 'in_attesa' && b.stato === 'in_attesa') return 1;
+        var da = a.dataRichiesta ? (a.dataRichiesta.toDate ? a.dataRichiesta.toDate().getTime() : 0) : 0;
+        var db2 = b.dataRichiesta ? (b.dataRichiesta.toDate ? b.dataRichiesta.toDate().getTime() : 0) : 0;
+        return da - db2;
+      });
+
+      container.innerHTML = '';
+
+      var inAttesa = richieste.filter(function (r) { return r.stato === 'in_attesa'; }).length;
+      if (inAttesa > 0) {
+        badgeEl.textContent = inAttesa;
+        badgeEl.style.display = 'inline-flex';
+      } else {
+        badgeEl.style.display = 'none';
+      }
+
+      if (richieste.length === 0) {
+        container.innerHTML = mostraEmptyState(
+          '<svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>',
+          'Nessuna richiesta pendente'
+        );
+        return;
+      }
+
+      var max = Math.min(richieste.length, 6);
+      for (var i = 0; i < max; i++) {
+        var r = richieste[i];
+        var tipoLabel = r.tipo === 'preventivo' ? 'Preventivo' : (r.tipo === 'consulenza' ? 'Consulenza' : 'Fattibilità');
+        var dataStr = r.dataRichiesta && r.dataRichiesta.toDate ? formattaDataBreve(r.dataRichiesta) : '—';
+        var statoBadge = r.stato === 'in_attesa' ? 'badge-appointment' : 'badge-working';
+        var statoLabel = r.stato === 'in_attesa' ? 'In attesa' : 'In lavorazione';
+
+        var item = document.createElement('div');
+        item.className = 'richiesta-bo-dash-item';
+        item.style.cursor = 'pointer';
+
+        item.innerHTML =
+          '<div class="richiesta-bo-dash-left">' +
+            '<div class="richiesta-bo-dash-info">' +
+              '<div class="richiesta-bo-dash-cliente">' + escapeHtml(r.nomeCliente) + '</div>' +
+              '<div class="richiesta-bo-dash-dettaglio">' +
+                escapeHtml(tipoLabel) + ' &bull; da ' + escapeHtml(r.richiedenteNome) + ' &bull; ' + dataStr +
+              '</div>' +
+            '</div>' +
+          '</div>' +
+          '<span class="badge ' + statoBadge + '" style="white-space:nowrap;">' + escapeHtml(statoLabel) + '</span>';
+
+        (function (leadId) {
+          item.addEventListener('click', function () {
+            window.location.href = 'lead-dettaglio.html?id=' + leadId;
+          });
+        })(r.leadId);
+
+        container.appendChild(item);
+      }
+
+      if (richieste.length > max) {
+        var linkTutte = document.createElement('div');
+        linkTutte.style.textAlign = 'center';
+        linkTutte.style.paddingTop = 'var(--space-3)';
+        linkTutte.innerHTML = '<a href="backoffice.html" style="color: var(--brand-primary); font-size: var(--text-sm); font-weight: var(--font-medium); text-decoration: none;">Vedi tutte (' + richieste.length + ') →</a>';
+        container.appendChild(linkTutte);
+      }
+
+    }).catch(function (errore) {
+      console.log('Errore caricamento richieste BO admin:', errore);
       container.innerHTML = mostraEmptyState(
         '<svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>',
         'Errore nel caricamento'
