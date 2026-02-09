@@ -253,7 +253,7 @@
       .where('dataCreazione', '>=', firebase.firestore.Timestamp.fromDate(periodo.da))
       .where('dataCreazione', '<=', firebase.firestore.Timestamp.fromDate(periodo.a))
       .orderBy('dataCreazione', 'desc')
-      .limit(10);
+      .limit(5);
 
     // Filtro per consulente
     if (utenteCorrente.ruolo === 'consulente') {
@@ -382,6 +382,155 @@
       container.innerHTML = mostraEmptyState(
         '<svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>',
         'Nessun appuntamento oggi'
+      );
+    });
+  }
+
+  // =============================================
+  // LISTA: Risposte Back Office (non lette)
+  // =============================================
+
+  function caricaRisposteBO() {
+    var container = document.getElementById('lista-risposte-bo');
+    var badgeEl = document.getElementById('badge-risposte-bo');
+
+    // Questa sezione è utile solo per i consulenti
+    // Per admin mostra tutte le risposte recenti, per BO non serve
+    if (utenteCorrente.ruolo === 'backoffice') {
+      container.innerHTML = mostraEmptyState(
+        '<svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>',
+        'Sezione per consulenti'
+      );
+      return;
+    }
+
+    // Prendi i lead del consulente (o tutti se admin)
+    var queryLead = db.collection('lead');
+    if (utenteCorrente.ruolo === 'consulente') {
+      queryLead = queryLead.where('consulenteId', '==', utenteCorrente.id);
+    }
+
+    queryLead.get().then(function (leadSnapshot) {
+      var promesse = [];
+      var leadMap = {};
+
+      leadSnapshot.forEach(function (doc) {
+        var leadData = doc.data();
+        var leadId = doc.id;
+        leadMap[leadId] = {
+          nome: (leadData.nome || '') + ' ' + (leadData.cognome || ''),
+          auto: leadData.autoRichiesta || ''
+        };
+
+        // Cerca le risposte BO completate e non lette
+        var p = db.collection('lead').doc(leadId)
+          .collection('richiesteBO')
+          .where('stato', '==', 'completata')
+          .get()
+          .then(function (richSnap) {
+            var risultati = [];
+            richSnap.forEach(function (richDoc) {
+              var richData = richDoc.data();
+              // Mostra solo quelle non lette dal consulente
+              if (richData.lettaDalConsulente === false) {
+                risultati.push({
+                  richiestaId: richDoc.id,
+                  leadId: leadId,
+                  nomeCliente: leadMap[leadId].nome,
+                  auto: leadMap[leadId].auto,
+                  tipo: richData.tipo || 'preventivo',
+                  rispostaBO: richData.rispostaBO || '',
+                  gestoreBONome: richData.gestoreBONome || 'Back Office',
+                  dataRisposta: richData.dataRisposta
+                });
+              }
+            });
+            return risultati;
+          });
+
+        promesse.push(p);
+      });
+
+      return Promise.all(promesse);
+    }).then(function (risultatiArray) {
+      // Appiattisci l'array
+      var risposte = [];
+      risultatiArray.forEach(function (arr) {
+        risposte = risposte.concat(arr);
+      });
+
+      // Ordina per data risposta (più recenti prima)
+      risposte.sort(function (a, b) {
+        var da = a.dataRisposta ? (a.dataRisposta.toDate ? a.dataRisposta.toDate().getTime() : 0) : 0;
+        var db2 = b.dataRisposta ? (b.dataRisposta.toDate ? b.dataRisposta.toDate().getTime() : 0) : 0;
+        return db2 - da;
+      });
+
+      container.innerHTML = '';
+
+      // Aggiorna badge
+      if (risposte.length > 0) {
+        badgeEl.textContent = risposte.length;
+        badgeEl.style.display = 'inline-flex';
+      } else {
+        badgeEl.style.display = 'none';
+      }
+
+      if (risposte.length === 0) {
+        container.innerHTML = mostraEmptyState(
+          '<svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>',
+          'Nessuna risposta da leggere'
+        );
+        return;
+      }
+
+      // Mostra max 5 risposte
+      var max = Math.min(risposte.length, 5);
+      for (var i = 0; i < max; i++) {
+        var r = risposte[i];
+        var tipoLabel = r.tipo === 'preventivo' ? 'Preventivo' : (r.tipo === 'consulenza' ? 'Consulenza' : 'Fattibilità');
+        var dataStr = r.dataRisposta && r.dataRisposta.toDate ? formattaDataBreve(r.dataRisposta) : '—';
+
+        var item = document.createElement('div');
+        item.className = 'risposta-bo-item';
+        item.setAttribute('data-lead-id', r.leadId);
+        item.setAttribute('data-richiesta-id', r.richiestaId);
+        item.style.cursor = 'pointer';
+
+        item.innerHTML =
+          '<div class="risposta-bo-left">' +
+            '<span class="risposta-bo-dot"></span>' +
+            '<div class="risposta-bo-info">' +
+              '<div class="risposta-bo-cliente">' + escapeHtml(r.nomeCliente) + '</div>' +
+              '<div class="risposta-bo-dettaglio">' + escapeHtml(tipoLabel) + ' &bull; ' + dataStr + '</div>' +
+              '<div class="risposta-bo-testo">' + escapeHtml(r.rispostaBO.substring(0, 80)) + (r.rispostaBO.length > 80 ? '...' : '') + '</div>' +
+            '</div>' +
+          '</div>';
+
+        // Click → vai al lead e segna come letta
+        (function (leadId, richiestaId) {
+          item.addEventListener('click', function () {
+            // Segna come letta
+            db.collection('lead').doc(leadId)
+              .collection('richiesteBO').doc(richiestaId)
+              .update({ lettaDalConsulente: true })
+              .then(function () {
+                window.location.href = 'lead-dettaglio.html?id=' + leadId;
+              })
+              .catch(function () {
+                window.location.href = 'lead-dettaglio.html?id=' + leadId;
+              });
+          });
+        })(r.leadId, r.richiestaId);
+
+        container.appendChild(item);
+      }
+
+    }).catch(function (errore) {
+      console.log('Errore caricamento risposte BO:', errore);
+      container.innerHTML = mostraEmptyState(
+        '<svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>',
+        'Errore nel caricamento'
       );
     });
   }
