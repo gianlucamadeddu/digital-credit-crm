@@ -3462,6 +3462,133 @@ textarea.form-input {
   color: #374151;
 }
 
+.badge-fonte-database {
+  background: #ECFDF5;
+  color: #047857;
+}
+
+/* ============ IMPORT EXCEL ============ */
+
+.import-info-box {
+  background: var(--bg-page);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  padding: var(--space-4);
+  margin-bottom: var(--space-4);
+}
+
+.import-info-box p {
+  margin: 0;
+  font-size: var(--text-sm);
+}
+
+.import-colonne-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-top: var(--space-2);
+}
+
+.import-col {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: var(--text-xs);
+  font-weight: var(--font-medium);
+  background: white;
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+}
+
+.import-col-obbligatorio {
+  background: #FEF3C7;
+  border-color: #FCD34D;
+  color: #92400E;
+}
+
+.import-upload-area {
+  border: 2px dashed var(--border-color);
+  border-radius: 12px;
+  padding: var(--space-8) var(--space-4);
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: var(--text-secondary);
+}
+
+.import-upload-area:hover,
+.import-upload-area.drag-over {
+  border-color: var(--brand-primary);
+  background: rgba(230, 57, 70, 0.04);
+}
+
+.import-upload-area svg {
+  margin-bottom: var(--space-2);
+  opacity: 0.5;
+}
+
+.import-upload-area p {
+  margin: var(--space-1) 0;
+}
+
+.import-riepilogo {
+  display: flex;
+  gap: var(--space-4);
+  margin-bottom: var(--space-4);
+}
+
+.import-riepilogo-item {
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+}
+
+.import-riepilogo-ok strong {
+  color: #059669;
+}
+
+.import-riepilogo-errore strong {
+  color: #DC2626;
+}
+
+.import-campagna-info {
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+  margin-bottom: var(--space-3);
+  padding-bottom: var(--space-3);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.import-riga-errore {
+  background: #FEF2F2 !important;
+}
+
+.badge-errore-import {
+  background: #FEE2E2;
+  color: #991B1B;
+}
+
+.import-progress-container {
+  height: 12px;
+  background: #E5E7EB;
+  border-radius: 6px;
+  overflow: hidden;
+  margin-bottom: var(--space-3);
+}
+
+.import-progress-bar {
+  height: 100%;
+  background: var(--brand-primary);
+  border-radius: 6px;
+  transition: width 0.3s ease;
+}
+
+.import-progress-text {
+  text-align: center;
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+  font-weight: var(--font-medium);
+}
+
 /* ============ BADGE INTEGRAZIONE ============ */
 
 .badge-integrazione-make {
