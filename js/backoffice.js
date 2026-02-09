@@ -512,7 +512,8 @@ async function inviaRisposta(leadId, richiestaId, textareaId, tipo) {
       .update({
         stato: 'completata',
         rispostaBO: risposta,
-        dataRisposta: now
+        dataRisposta: now,
+        lettaDalConsulente: false
       });
 
     // 2. Aggiungi record nella timeline del lead
