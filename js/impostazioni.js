@@ -105,6 +105,11 @@ function inizializzaEventi() {
   document.getElementById('btn-annulla-reset').addEventListener('click', chiudiModaleReset);
   document.getElementById('btn-conferma-reset').addEventListener('click', confermaResetPassword);
 
+  // --- Elimina utente ---
+  document.getElementById('chiudi-modale-elimina-utente').addEventListener('click', chiudiModaleEliminaUtente);
+  document.getElementById('btn-annulla-elimina-utente').addEventListener('click', chiudiModaleEliminaUtente);
+  document.getElementById('btn-conferma-elimina-utente').addEventListener('click', confermaEliminaUtente);
+
   // --- Stati ---
   document.getElementById('btn-nuovo-stato').addEventListener('click', apriModaleNuovoStato);
   document.getElementById('chiudi-modale-stato').addEventListener('click', chiudiModaleStato);
@@ -146,16 +151,8 @@ function inizializzaEventi() {
 }
 
 // ============================================================
-// UTILITY: SHA-256 hash
+// UTILITY: SHA-256 hash — usa hashSHA256() da utils.js
 // ============================================================
-
-async function hashPassword(password) {
-  var encoder = new TextEncoder();
-  var data = encoder.encode(password);
-  var hashBuffer = await crypto.subtle.digest('SHA-256', data);
-  var hashArray = Array.from(new Uint8Array(hashBuffer));
-  return hashArray.map(function (b) { return b.toString(16).padStart(2, '0'); }).join('');
-}
 
 // ============================================================
 // UTILITY: Toast
@@ -284,6 +281,9 @@ function renderUtenti() {
       html += '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
     }
     html += '</button>';
+    html += '<button class="btn-icon btn-icon-danger" title="Elimina utente" onclick="apriModaleEliminaUtente(\'' + u.id + '\')">';
+    html += '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>';
+    html += '</button>';
     html += '</td>';
     html += '</tr>';
   });
@@ -366,20 +366,21 @@ async function salvaUtente() {
   try {
     if (!id) {
       // --- CREAZIONE ---
-      // Verifica username univoco
-      var check = await db.collection('utenti').where('username', '==', username).get();
+      // Verifica username univoco (normalizzato in minuscolo)
+      var usernameLower = username.toLowerCase();
+      var check = await db.collection('utenti').where('username', '==', usernameLower).get();
       if (!check.empty) {
         mostraToast('Username già esistente. Scegline un altro.', 'error');
         return;
       }
 
-      var hashedPw = await hashPassword(password);
+      var hashedPw = await hashSHA256(password);
       await db.collection('utenti').add({
         nome: nome,
         cognome: cognome,
         email: email,
         telefono: telefono,
-        username: username,
+        username: usernameLower,
         password: hashedPw,
         ruolo: ruolo,
         attivo: true,
@@ -399,7 +400,7 @@ async function salvaUtente() {
       };
 
       if (password) {
-        datiAggiornati.password = await hashPassword(password);
+        datiAggiornati.password = await hashSHA256(password);
       }
 
       await db.collection('utenti').doc(id).update(datiAggiornati);
@@ -440,7 +441,7 @@ async function confermaResetPassword() {
   }
 
   try {
-    var hashedPw = await hashPassword(nuovaPassword);
+    var hashedPw = await hashSHA256(nuovaPassword);
     await db.collection('utenti').doc(utenteId).update({ password: hashedPw });
     mostraToast('Password resettata con successo', 'success');
     chiudiModaleReset();
@@ -470,6 +471,50 @@ async function toggleAttivoUtente(utenteId) {
   } catch (errore) {
     console.error('Errore toggle attivo:', errore);
     mostraToast('Errore nell\'aggiornamento', 'error');
+  }
+}
+
+// --- Elimina Utente ---
+function apriModaleEliminaUtente(utenteId) {
+  var u = utenti.find(function (ut) { return ut.id === utenteId; });
+  if (!u) return;
+
+  // Non permettere di eliminare se stessi
+  var utenteCorrente = getUtenteCorrente();
+  if (utenteCorrente && utenteCorrente.id === utenteId) {
+    mostraToast('Non puoi eliminare il tuo stesso account', 'error');
+    return;
+  }
+
+  document.getElementById('elimina-utente-id').value = u.id;
+  document.getElementById('elimina-utente-nome').textContent = u.nome + ' ' + u.cognome;
+  document.getElementById('modale-elimina-utente').style.display = 'flex';
+}
+
+function chiudiModaleEliminaUtente() {
+  document.getElementById('modale-elimina-utente').style.display = 'none';
+}
+
+async function confermaEliminaUtente() {
+  var utenteId = document.getElementById('elimina-utente-id').value;
+  if (!utenteId) return;
+
+  // Sicurezza: non eliminare se stessi
+  var utenteCorrente = getUtenteCorrente();
+  if (utenteCorrente && utenteCorrente.id === utenteId) {
+    mostraToast('Non puoi eliminare il tuo stesso account', 'error');
+    chiudiModaleEliminaUtente();
+    return;
+  }
+
+  try {
+    await db.collection('utenti').doc(utenteId).delete();
+    mostraToast('Utente eliminato con successo', 'success');
+    chiudiModaleEliminaUtente();
+    await caricaUtenti();
+  } catch (errore) {
+    console.error('Errore eliminazione utente:', errore);
+    mostraToast('Errore nell\'eliminazione dell\'utente', 'error');
   }
 }
 
