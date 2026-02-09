@@ -291,6 +291,25 @@
 
   <!-- ============ MODALE RESET PASSWORD ============ -->
   <div class="modal-overlay" id="modale-reset-password" style="display:none;">
+
+  <!-- ============ MODALE ELIMINA UTENTE ============ -->
+  <div class="modal-overlay" id="modale-elimina-utente" style="display:none;">
+    <div class="modal modal-sm">
+      <div class="modal-header">
+        <h3 class="modal-title">Elimina Utente</h3>
+        <button class="modal-close" id="chiudi-modale-elimina-utente">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p>Sei sicuro di voler eliminare l'utente <strong id="elimina-utente-nome"></strong>?</p>
+        <p class="text-muted" style="margin-top: var(--space-2); font-size: var(--text-sm);">Questa azione è irreversibile. I lead assegnati a questo utente NON verranno eliminati.</p>
+        <input type="hidden" id="elimina-utente-id" value="">
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" id="btn-annulla-elimina-utente">Annulla</button>
+        <button class="btn btn-danger" id="btn-conferma-elimina-utente">Elimina</button>
+      </div>
+    </div>
+  </div>
     <div class="modal modal-sm">
       <div class="modal-header">
         <h3 class="modal-title">Reset Password</h3>
