@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Agenda - Digital Credit</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/agenda.css">
+</head>
+<body>
+  <div class="app-container">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-logo">
+        <img src="assets/logo.png" alt="Digital Credit" style="height: 120px; width: auto; padding: 10px; background: white; border-radius: 8px;">
+      </div>
+      <div class="sidebar-section-title">Menu Principale</div>
+      <nav class="sidebar-nav">
+        <a href="dashboard.html" class="sidebar-item">
+          <svg class="sidebar-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+          <span>Dashboard</span>
+        </a>
+        <a href="lead-kanban.html" class="sidebar-item">
+          <svg class="sidebar-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          <span>Lead</span>
+        </a>
+        <a href="backoffice.html" class="sidebar-item" id="nav-backoffice">
+          <svg class="sidebar-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><line x1="10" y1="9" x2="8" y2="9"/></svg>
+          <span>Back Office</span>
+        </a>
+        <a href="agenda.html" class="sidebar-item active">
+          <svg class="sidebar-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          <span>Agenda</span>
+        </a>
+        <a href="template.html" class="sidebar-item">
+          <svg class="sidebar-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          <span>Template Messaggi</span>
+        </a>
+        <a href="comunicazioni.html" class="sidebar-item">
+          <svg class="sidebar-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+          <span>Comunicazioni</span>
+          <span class="badge-notification" id="badge-comunicazioni" style="display:none;">0</span>
+        </a>
+        <a href="report.html" class="sidebar-item">
+          <svg class="sidebar-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+          <span>Report</span>
+        </a>
+      </nav>
+      <div class="sidebar-section-title">Amministrazione</div>
+      <nav class="sidebar-nav">
+        <a href="impostazioni.html" class="sidebar-item" id="nav-impostazioni">
+          <svg class="sidebar-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          <span>Impostazioni</span>
+        </a>
+      </nav>
+      <!-- Info utente -->
+      <div style="position: absolute; bottom: 0; left: 0; right: 0; padding: var(--space-4); border-top: 1px solid rgba(255,255,255,0.1);">
+        <div style="display: flex; align-items: center; gap: var(--space-3); margin-bottom: var(--space-3);">
+          <div style="width: 36px; height: 36px; border-radius: 50%; background: var(--bg-sidebar-active); display: flex; align-items: center; justify-content: center; color: white; font-weight: 600; font-size: var(--text-sm);" id="user-avatar">A</div>
+          <div>
+            <div style="color: var(--text-sidebar-active); font-size: var(--text-sm); font-weight: var(--font-medium);" id="user-name-sidebar">Admin</div>
+            <div style="color: var(--text-muted); font-size: var(--text-xs);" id="user-role-sidebar">Amministratore</div>
+          </div>
+        </div>
+        <a href="#" onclick="logout(); return false;" class="sidebar-item" style="padding: var(--space-2) var(--space-3);">
+          <svg class="sidebar-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          <span>Esci</span>
+        </a>
+      </div>
+    </aside>
+
+    <!-- CONTENUTO PRINCIPALE -->
+    <main class="main-content">
+      <header class="page-header">
+        <h1 class="page-title">Agenda</h1>
+      </header>
+
+      <div class="page-content fade-in">
+        <!-- Toolbar -->
+        <div class="agenda-toolbar">
+          <div class="agenda-nav">
+            <button class="agenda-nav-btn" id="btn-prev-month" title="Mese precedente">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+            </button>
+            <span class="agenda-month-label" id="month-label">Febbraio 2025</span>
+            <button class="agenda-nav-btn" id="btn-next-month" title="Mese successivo">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+            </button>
+            <button class="btn btn-secondary" id="btn-oggi">Oggi</button>
+          </div>
+          <div class="agenda-actions">
+            <div id="filtro-consulente-container" style="display:none;">
+              <select class="form-input" id="filtro-consulente" style="width: 200px; padding: var(--space-2) var(--space-3);">
+                <option value="">Tutti i consulenti</option>
+              </select>
+            </div>
+            <button class="btn btn-primary" id="btn-nuovo-evento">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              Nuovo Evento
+            </button>
+          </div>
+        </div>
+
+        <!-- Layout calendario + pannello laterale -->
+        <div class="agenda-layout">
+          <div>
+            <div class="calendar-grid">
+              <div class="calendar-header-row">
+                <div class="calendar-header-cell">Lun</div>
+                <div class="calendar-header-cell">Mar</div>
+                <div class="calendar-header-cell">Mer</div>
+                <div class="calendar-header-cell">Gio</div>
+                <div class="calendar-header-cell">Ven</div>
+                <div class="calendar-header-cell">Sab</div>
+                <div class="calendar-header-cell">Dom</div>
+              </div>
+              <div class="calendar-body" id="calendar-body"></div>
+            </div>
+          </div>
+
+          <!-- Pannello dettaglio giorno -->
+          <div class="day-detail-panel" id="day-detail-panel">
+            <div class="day-detail-title" id="day-detail-title">Seleziona un giorno</div>
+            <div id="day-detail-content">
+              <div class="empty-day-message">
+                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                <p>Clicca su un giorno per vederne gli eventi</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- MODALE NUOVO/MODIFICA EVENTO -->
+  <div class="modal-overlay" id="modal-evento">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 class="modal-title" id="modal-evento-title">Nuovo Evento</h3>
+        <button class="modal-close" onclick="chiudiModaleEvento()">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label">Tipo evento</label>
+          <select class="form-input" id="evento-tipo">
+            <option value="appuntamento">📘 Appuntamento cliente</option>
+            <option value="followup">📙 Follow-up</option>
+            <option value="scadenza_personale">📗 Scadenza personale</option>
+            <option value="scadenza_pratica">📕 Scadenza pratica</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Titolo *</label>
+          <input type="text" class="form-input" id="evento-titolo" placeholder="Es: Chiamare Mario Rossi">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Descrizione</label>
+          <textarea class="form-input" id="evento-descrizione" rows="3" placeholder="Note aggiuntive..." style="resize: vertical;"></textarea>
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: var(--space-4);">
+          <div class="form-group">
+            <label class="form-label">Data *</label>
+            <input type="date" class="form-input" id="evento-data">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Ora *</label>
+            <input type="time" class="form-input" id="evento-ora" value="09:00">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Durata</label>
+            <select class="form-input" id="evento-durata">
+              <option value="15">15 min</option>
+              <option value="30" selected>30 min</option>
+              <option value="45">45 min</option>
+              <option value="60">1 ora</option>
+              <option value="90">1h 30min</option>
+              <option value="120">2 ore</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Lead collegato (opzionale)</label>
+          <div class="lead-search-container">
+            <input type="text" class="lead-search-input" id="evento-lead-search" placeholder="Cerca un lead per nome..." autocomplete="off">
+            <div class="lead-search-dropdown" id="lead-search-dropdown"></div>
+          </div>
+          <div id="lead-selected-container" style="display:none;">
+            <span class="lead-selected-tag" id="lead-selected-tag">
+              <span id="lead-selected-name"></span>
+              <span class="remove-lead" onclick="rimuoviLeadSelezionato()">✕</span>
+            </span>
+          </div>
+          <input type="hidden" id="evento-lead-id">
+          <input type="hidden" id="evento-lead-nome">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="chiudiModaleEvento()">Annulla</button>
+        <button class="btn btn-primary" id="btn-salva-evento">Salva</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODALE DETTAGLIO EVENTO -->
+  <div class="modal-overlay" id="modal-dettaglio-evento">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 class="modal-title" id="modal-dettaglio-title">Dettaglio Evento</h3>
+        <button class="modal-close" onclick="chiudiModaleDettaglio()">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <div class="modal-body" id="modal-dettaglio-body"></div>
+      <div class="modal-footer">
+        <div class="modal-footer-left">
+          <button class="btn btn-secondary" style="color: #EF4444; border-color: #FCA5A5;" id="btn-elimina-evento">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+            Elimina
+          </button>
+          <div style="display: flex; gap: var(--space-3);">
+            <button class="btn btn-secondary" id="btn-modifica-evento">Modifica</button>
+            <button class="btn btn-secondary" onclick="chiudiModaleDettaglio()">Chiudi</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast container -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+  <script src="js/firebase-config.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/agenda.js"></script>
+</body>
+</html>
