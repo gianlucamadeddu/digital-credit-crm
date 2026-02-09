@@ -7,6 +7,16 @@
 
 // Stati protetti: usati nel codice, NON eliminabili
 var STATI_PROTETTI = ['nuovo', 'perfezionamento', 'venduto'];
+// Genera token casuale per sicurezza webhook
+function generaToken(lunghezza) {
+  lunghezza = lunghezza || 16;
+  var caratteri = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  var token = '';
+  for (var i = 0; i < lunghezza; i++) {
+    token += caratteri.charAt(Math.floor(Math.random() * caratteri.length));
+  }
+  return token;
+}
 
 let utenti = [];
 let stati = [];
@@ -1028,6 +1038,7 @@ async function salvaCampagna() {
         attiva: true,
         distribuzione: distribuzione,
         contatori: contatori,
+        token: generaToken(),
         dataCreazione: firebase.firestore.FieldValue.serverTimestamp()
       });
 
