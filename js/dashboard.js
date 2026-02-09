@@ -114,6 +114,7 @@
     caricaClientiRecenti();
     caricaAppuntamentiOggi();
     caricaComunicazioni();
+    caricaRisposteBO();
   }
 
   // =============================================
