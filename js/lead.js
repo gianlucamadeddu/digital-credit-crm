@@ -1660,3 +1660,191 @@ if (typeof mostraToast === 'undefined') {
     }, 3000);
   }
 }
+
+// ===================================================================
+// FUNZIONI TEMPLATE & APPUNTAMENTO PER LEAD-DETTAGLIO
+// Sostituisci le funzioni precedenti (se le avevi aggiunte) con queste
+// Aggiungi tutto questo blocco IN FONDO al tuo lead.js
+// ===================================================================
+
+// --- Bottone "Appuntamento" → apre l'agenda con lead precompilato ---
+function apriAgendaConLead() {
+  // Adatta 'leadCorrente' al nome della variabile che usi nel tuo lead.js
+  if (!leadCorrente) return;
+  var leadId = leadCorrente.id;
+  var leadNome = encodeURIComponent((leadCorrente.nome || '') + ' ' + (leadCorrente.cognome || ''));
+  window.location.href = 'agenda.html?nuovoEvento=true&leadId=' + leadId + '&leadNome=' + leadNome;
+}
+
+// --- Bottone "Usa Template" → modale con lista template ---
+async function apriModaleUsaTemplate() {
+  var modal = document.getElementById('modal-usa-template-lead');
+  if (!modal) {
+    console.error('Modale modal-usa-template-lead non trovata nel DOM');
+    return;
+  }
+  modal.style.display = 'flex';
+
+  document.getElementById('modal-usa-template-body').style.display = 'block';
+  document.getElementById('modal-usa-template-preview').style.display = 'none';
+
+  var utente = getUtenteCorrente();
+  var db = firebase.firestore();
+  var container = document.getElementById('lista-template-lead');
+  container.innerHTML = '<p style="text-align:center;color:var(--text-muted);padding:24px;">Caricamento...</p>';
+
+  try {
+    // FIX: rimosso orderBy che richiedeva indice Firestore
+    var snapshot = await db.collection('templateMessaggi').get();
+
+    // Ordina manualmente per data
+    var templates = [];
+    snapshot.forEach(function(doc) {
+      templates.push({ id: doc.id, ...doc.data() });
+    });
+    templates.sort(function(a, b) {
+      var da = a.dataCreazione ? a.dataCreazione.toMillis() : 0;
+      var db2 = b.dataCreazione ? b.dataCreazione.toMillis() : 0;
+      return db2 - da;
+    });
+
+    container.innerHTML = '';
+    var count = 0;
+
+    templates.forEach(function(t) {
+      // Mostra solo globali + miei personali
+      if (t.utenteId !== 'globale' && t.utenteId !== utente.id) return;
+
+      count++;
+      var card = document.createElement('div');
+      card.style.cssText = 'padding:12px 16px;border:1px solid var(--border-color);border-radius:10px;margin-bottom:8px;cursor:pointer;transition:all 0.15s;display:flex;align-items:center;gap:12px;';
+      card.onmouseenter = function() { this.style.background = 'var(--hover-bg)'; this.style.borderColor = '#ccc'; };
+      card.onmouseleave = function() { this.style.background = ''; this.style.borderColor = 'var(--border-color)'; };
+
+      var icon = t.tipo === 'whatsapp' ? '💬' : '✉️';
+      var iconColor = t.tipo === 'whatsapp' ? '#25D366' : '#3B82F6';
+      var badge = t.utenteId === 'globale' ? ' <span style="font-size:0.6rem;background:#F3F4F6;padding:2px 6px;border-radius:99px;color:var(--text-secondary);font-weight:600;">GLOBALE</span>' : '';
+
+      card.innerHTML =
+        '<div style="font-size:1.4rem;width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;background:' + (t.tipo === 'whatsapp' ? '#F0FDF4' : '#EFF6FF') + ';">' + icon + '</div>' +
+        '<div style="flex:1;min-width:0;">' +
+          '<div style="font-weight:500;font-size:0.9rem;">' + escapeHtml(t.nome) + badge + '</div>' +
+          '<div style="font-size:0.78rem;color:var(--text-muted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + escapeHtml((t.testo || '').substring(0, 100)) + '</div>' +
+        '</div>' +
+        '<div style="color:var(--text-muted);font-size:0.85rem;">→</div>';
+
+      card.addEventListener('click', function() {
+        mostraAnteprimaTemplateLead(t);
+      });
+
+      container.appendChild(card);
+    });
+
+    if (count === 0) {
+      container.innerHTML = '<div style="text-align:center;padding:32px 16px;">' +
+        '<div style="font-size:2rem;margin-bottom:8px;">📝</div>' +
+        '<p style="color:var(--text-muted);margin-bottom:12px;">Nessun template disponibile</p>' +
+        '<a href="template.html" class="btn btn-secondary" style="font-size:0.85rem;">+ Crea il tuo primo template</a>' +
+      '</div>';
+    }
+
+  } catch (error) {
+    console.error('Errore caricamento template:', error);
+    container.innerHTML = '<p style="text-align:center;color:#EF4444;padding:24px;">Errore nel caricamento. Controlla la console.</p>';
+  }
+}
+
+function chiudiModaleUsaTemplateLead() {
+  document.getElementById('modal-usa-template-lead').style.display = 'none';
+}
+
+function tornaListaTemplateLead() {
+  document.getElementById('modal-usa-template-body').style.display = 'block';
+  document.getElementById('modal-usa-template-preview').style.display = 'none';
+}
+
+function mostraAnteprimaTemplateLead(template) {
+  document.getElementById('modal-usa-template-body').style.display = 'none';
+  document.getElementById('modal-usa-template-preview').style.display = 'block';
+
+  var utente = getUtenteCorrente();
+  var nomeConsulente = utente ? ((utente.nome || '') + ' ' + (utente.cognome || '')).trim() : '';
+
+  // Usa la funzione da utils.js
+  var messaggio = sostituisciVariabili(template.testo, leadCorrente, nomeConsulente);
+
+  var previewEl = document.getElementById('usa-template-preview-text');
+  previewEl.textContent = messaggio;
+
+  // Info lead in alto nell'anteprima
+  var nomeCliente = ((leadCorrente.nome || '') + ' ' + (leadCorrente.cognome || '')).trim();
+  var infoLead = document.getElementById('usa-template-info-lead');
+  if (infoLead) {
+    infoLead.innerHTML = '<strong>' + escapeHtml(nomeCliente) + '</strong>' +
+      (leadCorrente.telefono ? ' • ' + escapeHtml(leadCorrente.telefono) : '') +
+      (leadCorrente.email ? ' • ' + escapeHtml(leadCorrente.email) : '');
+  }
+
+  // Configura bottone invio
+  var btnInvia = document.getElementById('btn-usa-template-invia');
+
+  if (template.tipo === 'whatsapp') {
+    btnInvia.textContent = '💬 Apri WhatsApp';
+    btnInvia.style.background = '#25D366';
+    btnInvia.style.color = 'white';
+    btnInvia.style.borderColor = '#25D366';
+    btnInvia.onclick = function() {
+      var telefono = (leadCorrente.telefono || '').replace(/\s/g, '').replace(/^\+?39/, '');
+      if (!telefono) {
+        mostraToast('Telefono non disponibile per questo lead', 'error');
+        return;
+      }
+      var url = 'https://wa.me/39' + telefono + '?text=' + encodeURIComponent(messaggio);
+      window.open(url, '_blank');
+      chiudiModaleUsaTemplateLead();
+    };
+  } else {
+    btnInvia.textContent = '✉️ Apri Email';
+    btnInvia.style.background = '#3B82F6';
+    btnInvia.style.color = 'white';
+    btnInvia.style.borderColor = '#3B82F6';
+    btnInvia.onclick = function() {
+      if (!leadCorrente.email) {
+        mostraToast('Email non disponibile per questo lead', 'error');
+        return;
+      }
+      var oggetto = sostituisciVariabili(template.oggetto || '', leadCorrente, nomeConsulente);
+      var url = 'mailto:' + leadCorrente.email +
+        '?subject=' + encodeURIComponent(oggetto) +
+        '&body=' + encodeURIComponent(messaggio);
+      window.location.href = url;
+      chiudiModaleUsaTemplateLead();
+    };
+  }
+
+  previewEl.style.background = template.tipo === 'whatsapp' ? '#F0FDF4' : '#EFF6FF';
+  previewEl.style.borderColor = template.tipo === 'whatsapp' ? '#BBF7D0' : '#BFDBFE';
+}
+
+// Helper (se non esiste già nel tuo lead.js)
+function escapeHtml(text) {
+  if (!text) return '';
+  var div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
+}
+
+// Helper toast (se non esiste già)
+function mostraToast(msg, tipo) {
+  if (typeof window.mostraNotifica === 'function') {
+    window.mostraNotifica(msg, tipo);
+    return;
+  }
+  // Fallback semplice
+  var toast = document.createElement('div');
+  toast.style.cssText = 'position:fixed;bottom:24px;right:24px;padding:12px 20px;border-radius:8px;color:white;font-size:0.9rem;z-index:9999;animation:fadeIn 0.3s;';
+  toast.style.background = tipo === 'error' ? '#EF4444' : '#10B981';
+  toast.textContent = msg;
+  document.body.appendChild(toast);
+  setTimeout(function() { toast.remove(); }, 3000);
+}
