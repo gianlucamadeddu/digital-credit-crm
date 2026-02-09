@@ -55,7 +55,11 @@
       window.location.href = 'report.html';
     });
     document.getElementById('widget-lead-nuovi').addEventListener('click', function () {
-      window.location.href = 'lead-kanban.html';
+      if (utenteCorrente.ruolo === 'backoffice') {
+        window.location.href = 'backoffice.html';
+      } else {
+        window.location.href = 'lead-kanban.html';
+      }
     });
   });
 
@@ -82,6 +86,17 @@
       subtitleEl.textContent = 'Richieste e pratiche in corso';
     } else {
       subtitleEl.textContent = 'Panoramica generale';
+    }
+
+    // Per Back Office: personalizza widget 4 e card BO
+    if (ruolo === 'backoffice') {
+      // Widget 4: cambia label
+      var labelWidget4 = document.getElementById('label-lead-nuovi');
+      if (labelWidget4) labelWidget4.textContent = 'Richieste in Attesa';
+
+      // Card BO: cambia titolo
+      var titoloBO = document.getElementById('titolo-sezione-bo');
+      if (titoloBO) titoloBO.textContent = 'Richieste Back Office';
     }
   }
 
@@ -153,7 +168,7 @@
   }
 
   // =============================================
-  // WIDGET 1: Lead Totali + WIDGET 4: Lead Nuovi
+  // WIDGET 1: Lead Totali + WIDGET 4: Lead Nuovi / Richieste BO
   // =============================================
 
   function caricaWidgetLead() {
@@ -187,10 +202,48 @@
       });
 
       document.getElementById('num-lead-totali').textContent = totali;
-      document.getElementById('num-lead-nuovi').textContent = nuovi;
+
+      // Per BO il widget 4 mostra le richieste in attesa (calcolato separatamente)
+      if (utenteCorrente.ruolo !== 'backoffice') {
+        document.getElementById('num-lead-nuovi').textContent = nuovi;
+      }
     }).catch(function (errore) {
       console.log('Errore caricamento lead:', errore);
       document.getElementById('num-lead-totali').textContent = '0';
+      if (utenteCorrente.ruolo !== 'backoffice') {
+        document.getElementById('num-lead-nuovi').textContent = '0';
+      }
+    });
+
+    // Per BO: conta le richieste in attesa per il widget 4
+    if (utenteCorrente.ruolo === 'backoffice') {
+      contaRichiesteInAttesa();
+    }
+  }
+
+  // Conta richieste in attesa per il widget BO
+  function contaRichiesteInAttesa() {
+    db.collection('lead').get().then(function (leadSnapshot) {
+      var promesse = [];
+
+      leadSnapshot.forEach(function (doc) {
+        var p = db.collection('lead').doc(doc.id)
+          .collection('richiesteBO')
+          .where('stato', '==', 'in_attesa')
+          .get()
+          .then(function (richSnap) {
+            return richSnap.size;
+          });
+        promesse.push(p);
+      });
+
+      return Promise.all(promesse);
+    }).then(function (conteggi) {
+      var totale = 0;
+      conteggi.forEach(function (n) { totale += n; });
+      document.getElementById('num-lead-nuovi').textContent = totale;
+    }).catch(function (errore) {
+      console.log('Errore conteggio richieste BO:', errore);
       document.getElementById('num-lead-nuovi').textContent = '0';
     });
   }
@@ -257,8 +310,6 @@
 
     // Filtro per consulente
     if (utenteCorrente.ruolo === 'consulente') {
-      // Firestore richiede un indice composto per consulenteId + dataCreazione
-      // Usiamo un filtro lato client come fallback
       query = db.collection('lead')
         .where('consulenteId', '==', utenteCorrente.id)
         .orderBy('dataCreazione', 'desc')
@@ -387,22 +438,161 @@
   }
 
   // =============================================
-  // LISTA: Risposte Back Office (non lette)
+  // LISTA: Risposte BO (consulenti/admin) / Richieste BO (backoffice)
   // =============================================
 
   function caricaRisposteBO() {
+    // Per backoffice: mostra le richieste da gestire
+    if (utenteCorrente.ruolo === 'backoffice') {
+      caricaRichiestePerBO();
+      return;
+    }
+
+    // Per consulenti/admin: mostra le risposte completate non lette
+    caricaRispostePerConsulente();
+  }
+
+  // --- BACKOFFICE: Richieste in attesa e in lavorazione ---
+  function caricaRichiestePerBO() {
     var container = document.getElementById('lista-risposte-bo');
     var badgeEl = document.getElementById('badge-risposte-bo');
 
-    // Questa sezione è utile solo per i consulenti
-    // Per admin mostra tutte le risposte recenti, per BO non serve
-    if (utenteCorrente.ruolo === 'backoffice') {
+    // Prendi tutti i lead per cercare le subcollection richiesteBO
+    db.collection('lead').get().then(function (leadSnapshot) {
+      var promesse = [];
+      var leadMap = {};
+
+      leadSnapshot.forEach(function (doc) {
+        var leadData = doc.data();
+        var leadId = doc.id;
+        leadMap[leadId] = {
+          nome: (leadData.nome || '') + ' ' + (leadData.cognome || ''),
+          auto: leadData.autoRichiesta || ''
+        };
+
+        // Cerca richieste in_attesa e in_lavorazione
+        var p = db.collection('lead').doc(leadId)
+          .collection('richiesteBO')
+          .where('stato', 'in', ['in_attesa', 'in_lavorazione'])
+          .get()
+          .then(function (richSnap) {
+            var risultati = [];
+            richSnap.forEach(function (richDoc) {
+              var richData = richDoc.data();
+              risultati.push({
+                richiestaId: richDoc.id,
+                leadId: leadId,
+                nomeCliente: leadMap[leadId].nome,
+                auto: leadMap[leadId].auto,
+                tipo: richData.tipo || 'preventivo',
+                stato: richData.stato,
+                richiedenteNome: richData.richiedenteNome || '—',
+                nota: richData.nota || '',
+                dataRichiesta: richData.dataRichiesta
+              });
+            });
+            return risultati;
+          });
+
+        promesse.push(p);
+      });
+
+      return Promise.all(promesse);
+    }).then(function (risultatiArray) {
+      // Appiattisci
+      var richieste = [];
+      risultatiArray.forEach(function (arr) {
+        richieste = richieste.concat(arr);
+      });
+
+      // Ordina: prima in_attesa, poi in_lavorazione, poi per data (più vecchie prima = priorità)
+      richieste.sort(function (a, b) {
+        // Priorità stato: in_attesa prima
+        if (a.stato === 'in_attesa' && b.stato !== 'in_attesa') return -1;
+        if (a.stato !== 'in_attesa' && b.stato === 'in_attesa') return 1;
+        // Poi per data (più vecchie prima)
+        var da = a.dataRichiesta ? (a.dataRichiesta.toDate ? a.dataRichiesta.toDate().getTime() : 0) : 0;
+        var db2 = b.dataRichiesta ? (b.dataRichiesta.toDate ? b.dataRichiesta.toDate().getTime() : 0) : 0;
+        return da - db2;
+      });
+
+      container.innerHTML = '';
+
+      // Aggiorna badge
+      var inAttesa = richieste.filter(function (r) { return r.stato === 'in_attesa'; }).length;
+      if (inAttesa > 0) {
+        badgeEl.textContent = inAttesa;
+        badgeEl.style.display = 'inline-flex';
+      } else {
+        badgeEl.style.display = 'none';
+      }
+
+      if (richieste.length === 0) {
+        container.innerHTML = mostraEmptyState(
+          '<svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>',
+          'Nessuna richiesta da gestire'
+        );
+        return;
+      }
+
+      // Mostra max 8 richieste
+      var max = Math.min(richieste.length, 8);
+      for (var i = 0; i < max; i++) {
+        var r = richieste[i];
+        var tipoLabel = r.tipo === 'preventivo' ? 'Preventivo' : (r.tipo === 'consulenza' ? 'Consulenza' : 'Fattibilità');
+        var dataStr = r.dataRichiesta && r.dataRichiesta.toDate ? formattaDataBreve(r.dataRichiesta) : '—';
+
+        var statoBadge = r.stato === 'in_attesa' ? 'badge-appointment' : 'badge-working';
+        var statoLabel = r.stato === 'in_attesa' ? 'In attesa' : 'In lavorazione';
+
+        var item = document.createElement('div');
+        item.className = 'richiesta-bo-dash-item';
+        item.style.cursor = 'pointer';
+
+        item.innerHTML =
+          '<div class="richiesta-bo-dash-left">' +
+            '<div class="richiesta-bo-dash-info">' +
+              '<div class="richiesta-bo-dash-cliente">' + escapeHtml(r.nomeCliente) + '</div>' +
+              '<div class="richiesta-bo-dash-dettaglio">' +
+                escapeHtml(tipoLabel) + ' &bull; da ' + escapeHtml(r.richiedenteNome) + ' &bull; ' + dataStr +
+              '</div>' +
+              (r.nota ? '<div class="richiesta-bo-dash-nota">' + escapeHtml(r.nota.substring(0, 80)) + (r.nota.length > 80 ? '...' : '') + '</div>' : '') +
+            '</div>' +
+          '</div>' +
+          '<span class="badge ' + statoBadge + '" style="white-space:nowrap;">' + escapeHtml(statoLabel) + '</span>';
+
+        // Click → vai al dettaglio lead
+        (function (leadId) {
+          item.addEventListener('click', function () {
+            window.location.href = 'lead-dettaglio.html?id=' + leadId;
+          });
+        })(r.leadId);
+
+        container.appendChild(item);
+      }
+
+      // Link "Vedi tutte" se ce ne sono di più
+      if (richieste.length > max) {
+        var linkTutte = document.createElement('div');
+        linkTutte.style.textAlign = 'center';
+        linkTutte.style.paddingTop = 'var(--space-3)';
+        linkTutte.innerHTML = '<a href="backoffice.html" style="color: var(--brand-primary); font-size: var(--text-sm); font-weight: var(--font-medium); text-decoration: none;">Vedi tutte le richieste (' + richieste.length + ') →</a>';
+        container.appendChild(linkTutte);
+      }
+
+    }).catch(function (errore) {
+      console.log('Errore caricamento richieste BO:', errore);
       container.innerHTML = mostraEmptyState(
-        '<svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>',
-        'Sezione per consulenti'
+        '<svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>',
+        'Errore nel caricamento'
       );
-      return;
-    }
+    });
+  }
+
+  // --- CONSULENTI/ADMIN: Risposte BO completate non lette ---
+  function caricaRispostePerConsulente() {
+    var container = document.getElementById('lista-risposte-bo');
+    var badgeEl = document.getElementById('badge-risposte-bo');
 
     // Prendi i lead del consulente (o tutti se admin)
     var queryLead = db.collection('lead');
@@ -673,9 +863,6 @@
   // =============================================
   // FUNZIONI AUTH (fallback se auth.js non definisce)
   // =============================================
-
-  // Queste funzioni dovrebbero essere già in auth.js.
-  // Le definiamo come fallback solo se mancano.
 
   if (typeof window.getUtenteCorrente === 'undefined') {
     window.getUtenteCorrente = function () {
