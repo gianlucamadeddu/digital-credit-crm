@@ -43,9 +43,24 @@ async function inizializzaElencoLead() {
     }
 
     // Event listener per filtri
-    document.getElementById('filtro-periodo').addEventListener('change', applicaFiltri);
+    document.getElementById('filtro-periodo').addEventListener('change', function() {
+      // Mostra/nascondi campi data personalizzate
+      var dateGroup = document.getElementById('date-range-group');
+      if (this.value === 'personalizzato') {
+        dateGroup.style.display = 'inline-flex';
+      } else {
+        dateGroup.style.display = 'none';
+        applicaFiltri();
+      }
+    });
     document.getElementById('filtro-stato').addEventListener('change', applicaFiltri);
     document.getElementById('filtro-consulente').addEventListener('change', applicaFiltri);
+
+    // Event listener per date personalizzate
+    var filtroDaDa = document.getElementById('filtro-data-da');
+    var filtroDataA = document.getElementById('filtro-data-a');
+    if (filtroDaDa) filtroDaDa.addEventListener('change', applicaFiltri);
+    if (filtroDataA) filtroDataA.addEventListener('change', applicaFiltri);
 
     // Debounce per ricerca testo
     var timerRicerca = null;
@@ -171,28 +186,47 @@ function applicaFiltri() {
       var dataLead = lead.dataCreazione ? lead.dataCreazione.toDate() : new Date(0);
       var ora = new Date();
       var inizio;
+      var fine = null;
 
-      switch (filtroPeriodo) {
-        case 'oggi':
-          inizio = new Date(ora.getFullYear(), ora.getMonth(), ora.getDate());
-          break;
-        case 'settimana':
-          inizio = new Date(ora);
-          inizio.setDate(ora.getDate() - ora.getDay());
+      if (filtroPeriodo === 'personalizzato') {
+        // Date personalizzate
+        var valDa = document.getElementById('filtro-data-da').value;
+        var valA = document.getElementById('filtro-data-a').value;
+        if (valDa) {
+          inizio = new Date(valDa);
           inizio.setHours(0, 0, 0, 0);
-          break;
-        case 'mese':
-          inizio = new Date(ora.getFullYear(), ora.getMonth(), 1);
-          break;
-        case 'trimestre':
-          inizio = new Date(ora);
-          inizio.setMonth(ora.getMonth() - 3);
-          break;
-        case 'anno':
-          inizio = new Date(ora.getFullYear(), 0, 1);
-          break;
+        } else {
+          inizio = null;
+        }
+        if (valA) {
+          fine = new Date(valA);
+          fine.setHours(23, 59, 59, 999);
+        }
+        if (inizio && dataLead < inizio) return false;
+        if (fine && dataLead > fine) return false;
+      } else {
+        switch (filtroPeriodo) {
+          case 'oggi':
+            inizio = new Date(ora.getFullYear(), ora.getMonth(), ora.getDate());
+            break;
+          case 'settimana':
+            inizio = new Date(ora);
+            inizio.setDate(ora.getDate() - ora.getDay());
+            inizio.setHours(0, 0, 0, 0);
+            break;
+          case 'mese':
+            inizio = new Date(ora.getFullYear(), ora.getMonth(), 1);
+            break;
+          case 'trimestre':
+            inizio = new Date(ora);
+            inizio.setMonth(ora.getMonth() - 3);
+            break;
+          case 'anno':
+            inizio = new Date(ora.getFullYear(), 0, 1);
+            break;
+        }
+        if (dataLead < inizio) return false;
       }
-      if (dataLead < inizio) return false;
     }
 
     // Filtro stato
@@ -1788,6 +1822,20 @@ function calcolaDateDaPeriodo(valorePeriodo) {
       break;
     case 'anno':
       dataDa = new Date(ora.getFullYear(), 0, 1);
+      break;
+    case 'personalizzato':
+      var valDa = document.getElementById('filtro-data-da').value;
+      var valA = document.getElementById('filtro-data-a').value;
+      if (valDa) {
+        dataDa = new Date(valDa);
+        dataDa.setHours(0, 0, 0, 0);
+      }
+      if (valA) {
+        dataA = new Date(valA);
+        dataA.setHours(23, 59, 59, 999);
+      } else {
+        dataA = null;
+      }
       break;
     case 'tutti':
     default:
