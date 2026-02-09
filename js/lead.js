@@ -1743,3 +1743,312 @@ if (typeof mostraToast === 'undefined') {
     }, 3000);
   }
 }
+
+
+// ============================================
+// ESPORTAZIONE EXCEL
+// ============================================
+
+var _exportPendente = null;
+
+/**
+ * Inizializza il bottone export Excel
+ */
+function inizializzaExportExcel() {
+  var btnExport = document.getElementById('btn-esporta-excel');
+  if (btnExport) {
+    btnExport.addEventListener('click', avviaExportExcel);
+  }
+}
+
+/**
+ * Converte il valore del select #filtro-periodo in date Da/A
+ */
+function calcolaDateDaPeriodo(valorePeriodo) {
+  var ora = new Date();
+  var dataDa = null;
+  var dataA = new Date(ora.getFullYear(), ora.getMonth(), ora.getDate(), 23, 59, 59, 999);
+
+  switch (valorePeriodo) {
+    case 'oggi':
+      dataDa = new Date(ora.getFullYear(), ora.getMonth(), ora.getDate());
+      break;
+    case 'settimana':
+      dataDa = new Date(ora);
+      dataDa.setDate(ora.getDate() - ora.getDay());
+      dataDa.setHours(0, 0, 0, 0);
+      break;
+    case 'mese':
+      dataDa = new Date(ora.getFullYear(), ora.getMonth(), 1);
+      break;
+    case 'trimestre':
+      dataDa = new Date(ora);
+      dataDa.setMonth(ora.getMonth() - 3);
+      dataDa.setHours(0, 0, 0, 0);
+      break;
+    case 'anno':
+      dataDa = new Date(ora.getFullYear(), 0, 1);
+      break;
+    case 'tutti':
+    default:
+      dataDa = null;
+      dataA = null;
+      break;
+  }
+
+  return { dataDa: dataDa, dataA: dataA };
+}
+
+/**
+ * Raccoglie i filtri dalla toolbar (adattato al select periodo)
+ */
+function raccogliFiltriExport() {
+  var utenteCorrente = getUtenteCorrente();
+  var filtri = {};
+
+  // Periodo — converti il select in date
+  var valorePeriodo = document.getElementById('filtro-periodo').value;
+  var date = calcolaDateDaPeriodo(valorePeriodo);
+  if (date.dataDa) filtri.dataDa = date.dataDa;
+  if (date.dataA) filtri.dataA = date.dataA;
+
+  // Stato
+  var statoSelect = document.getElementById('filtro-stato');
+  if (statoSelect && statoSelect.value && statoSelect.value !== 'tutti') {
+    filtri.stato = statoSelect.value;
+  }
+
+  // Consulente
+  if (utenteCorrente.ruolo === 'admin' || utenteCorrente.ruolo === 'backoffice') {
+    var consulenteSelect = document.getElementById('filtro-consulente');
+    if (consulenteSelect && consulenteSelect.value && consulenteSelect.value !== 'tutti') {
+      filtri.consulenteId = consulenteSelect.value;
+    }
+  } else if (utenteCorrente.ruolo === 'consulente') {
+    filtri.consulenteId = utenteCorrente.id;
+  }
+
+  return filtri;
+}
+
+/**
+ * Avvia il processo di esportazione
+ */
+async function avviaExportExcel() {
+  try {
+    var filtri = raccogliFiltriExport();
+
+    // Usa i lead già filtrati in memoria (leadFiltrati) per il conteggio
+    var conteggio = leadFiltrati.length;
+
+    if (conteggio === 0) {
+      mostraToast('Nessun lead trovato con i filtri selezionati', 'warning');
+      return;
+    }
+
+    // Se più di 5000, chiedi conferma
+    if (conteggio > 5000) {
+      _exportPendente = filtri;
+      var testo = document.getElementById('export-conferma-testo');
+      testo.textContent = 'Stai per esportare ' + conteggio.toLocaleString('it-IT') + ' lead. L\'operazione potrebbe richiedere qualche secondo. Continuare?';
+      document.getElementById('modal-export-conferma').style.display = 'flex';
+      return;
+    }
+
+    await eseguiExport(filtri);
+
+  } catch (errore) {
+    console.error('Errore export:', errore);
+    mostraToast('Errore durante l\'esportazione', 'error');
+    nascondiOverlayExport();
+  }
+}
+
+/**
+ * Conferma export dopo modale (per > 5000 lead)
+ */
+async function confermaExport() {
+  chiudiModaleExport();
+  if (_exportPendente) {
+    await eseguiExport(_exportPendente);
+    _exportPendente = null;
+  }
+}
+
+function chiudiModaleExport() {
+  document.getElementById('modal-export-conferma').style.display = 'none';
+}
+
+/**
+ * Esegue l'export: usa i lead già filtrati in memoria + carica campagne per i nomi
+ */
+async function eseguiExport(filtri) {
+  mostraOverlayExport();
+
+  try {
+    // Carica mappa campagne (ID → nome) per la colonna Campagna
+    var campagneMap = await caricaMappaCampagneExport();
+
+    // Carica mappa completa utenti (include anche admin/bo, non solo consulenti)
+    var utentiMapExport = {};
+    // Usa consulentiMap già presente
+    Object.keys(consulentiMap).forEach(function(id) {
+      var c = consulentiMap[id];
+      utentiMapExport[id] = (c.nome || '') + ' ' + (c.cognome || '');
+    });
+
+    // Prepara le righe dal array leadFiltrati (già in memoria, già filtrati)
+    var righe = [];
+    leadFiltrati.forEach(function(l) {
+      righe.push({
+        'ID': l.id || '',
+        'Nome': l.nome || '',
+        'Cognome': l.cognome || '',
+        'Telefono': l.telefono || '',
+        'Email': l.email || '',
+        'Provincia': l.provincia || '',
+        'Stato': (statiMap[l.stato] ? statiMap[l.stato].nome : l.stato) || '',
+        'Fase': l.fase || '',
+        'Priorità': l.priorita || '',
+        'Consulente': utentiMapExport[l.consulenteId] || l.consulenteNome || '',
+        'Fonte': l.fonte || '',
+        'Campagna': campagneMap[l.campagna] || l.campagna || '',
+        'Tipo Cliente': l.tipoCliente || '',
+        'Auto Richiesta': l.autoRichiesta || '',
+        'Budget Mensile': l.budgetMensile || '',
+        'Durata Desiderata': l.durataDesiderata || '',
+        'Km Annui': l.kmAnnui || '',
+        'Data Creazione': formattaTimestampExport(l.dataCreazione),
+        'Data Ultima Modifica': formattaTimestampExport(l.dataUltimaModifica),
+        'Data Chiusura': formattaTimestampExport(l.dataChiusura),
+        'Note Esigenza': l.noteEsigenza || ''
+      });
+    });
+
+    if (righe.length === 0) {
+      mostraToast('Nessun lead trovato con i filtri selezionati', 'warning');
+      nascondiOverlayExport();
+      return;
+    }
+
+    // Genera il foglio Excel
+    var ws = XLSX.utils.json_to_sheet(righe);
+
+    // Larghezze colonne
+    ws['!cols'] = [
+      { wch: 22 },  // ID
+      { wch: 15 },  // Nome
+      { wch: 15 },  // Cognome
+      { wch: 14 },  // Telefono
+      { wch: 25 },  // Email
+      { wch: 12 },  // Provincia
+      { wch: 15 },  // Stato
+      { wch: 15 },  // Fase
+      { wch: 10 },  // Priorità
+      { wch: 18 },  // Consulente
+      { wch: 10 },  // Fonte
+      { wch: 22 },  // Campagna
+      { wch: 12 },  // Tipo Cliente
+      { wch: 18 },  // Auto Richiesta
+      { wch: 14 },  // Budget Mensile
+      { wch: 16 },  // Durata Desiderata
+      { wch: 10 },  // Km Annui
+      { wch: 18 },  // Data Creazione
+      { wch: 18 },  // Data Ultima Modifica
+      { wch: 18 },  // Data Chiusura
+      { wch: 30 }   // Note Esigenza
+    ];
+
+    var wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Lead');
+
+    // Genera nome file
+    var nomeFile = generaNomeFileExport(filtri, utentiMapExport);
+
+    // Scarica
+    XLSX.writeFile(wb, nomeFile);
+
+    nascondiOverlayExport();
+    mostraToast('✓ Esportati ' + righe.length + ' lead', 'success');
+
+  } catch (errore) {
+    console.error('Errore durante export:', errore);
+    nascondiOverlayExport();
+    mostraToast('Errore durante l\'esportazione. Riprova.', 'error');
+  }
+}
+
+/**
+ * Carica mappa ID campagna → nome campagna
+ */
+async function caricaMappaCampagneExport() {
+  var mappa = {};
+  try {
+    var snapshot = await db.collection('campagne').get();
+    snapshot.forEach(function(doc) {
+      var c = doc.data();
+      mappa[doc.id] = c.nome || doc.id;
+    });
+  } catch (e) {
+    console.error('Errore caricamento campagne per export:', e);
+  }
+  return mappa;
+}
+
+/**
+ * Formatta un Timestamp Firestore in "GG/MM/AAAA HH:mm"
+ */
+function formattaTimestampExport(timestamp) {
+  if (!timestamp) return '';
+  var data;
+  if (timestamp.toDate) {
+    data = timestamp.toDate();
+  } else if (timestamp instanceof Date) {
+    data = timestamp;
+  } else {
+    return '';
+  }
+  var gg = String(data.getDate()).padStart(2, '0');
+  var mm = String(data.getMonth() + 1).padStart(2, '0');
+  var aaaa = data.getFullYear();
+  var hh = String(data.getHours()).padStart(2, '0');
+  var min = String(data.getMinutes()).padStart(2, '0');
+  return gg + '/' + mm + '/' + aaaa + ' ' + hh + ':' + min;
+}
+
+/**
+ * Genera nome file: lead_export_DD-MM-YYYY_DD-MM-YYYY[_NomeConsulente].xlsx
+ */
+function generaNomeFileExport(filtri, utentiMap) {
+  var oggi = new Date();
+
+  function fmtData(d) {
+    var gg = String(d.getDate()).padStart(2, '0');
+    var mm = String(d.getMonth() + 1).padStart(2, '0');
+    var aaaa = d.getFullYear();
+    return gg + '-' + mm + '-' + aaaa;
+  }
+
+  var dataDaStr = filtri.dataDa ? fmtData(filtri.dataDa) : fmtData(new Date(oggi.getFullYear(), oggi.getMonth(), 1));
+  var dataAStr = filtri.dataA ? fmtData(filtri.dataA) : fmtData(oggi);
+
+  var nome = 'lead_export_' + dataDaStr + '_' + dataAStr;
+
+  // Aggiungi nome consulente se filtrato
+  if (filtri.consulenteId && utentiMap[filtri.consulenteId]) {
+    var nomeConsulente = utentiMap[filtri.consulenteId].trim().split(' ')[0];
+    nome += '_' + nomeConsulente;
+  }
+
+  return nome + '.xlsx';
+}
+
+function mostraOverlayExport() {
+  var overlay = document.getElementById('export-overlay');
+  if (overlay) overlay.style.display = 'flex';
+}
+
+function nascondiOverlayExport() {
+  var overlay = document.getElementById('export-overlay');
+  if (overlay) overlay.style.display = 'none';
+}
