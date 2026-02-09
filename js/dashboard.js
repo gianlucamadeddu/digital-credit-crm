@@ -39,6 +39,9 @@
       caricaDashboard();
     });
 
+    // Controlla comunicazioni non lette e mostra popup
+    controllaComunicazioniNonLette();
+    
     // Listener logout
     document.getElementById('btn-logout').addEventListener('click', function () {
       logout();
@@ -1026,5 +1029,41 @@
   function logout() {
     window.logout();
   }
+// =============================================
+  // POPUP COMUNICAZIONI NON LETTE
+  // =============================================
 
+  function controllaComunicazioniNonLette() {
+    db.collection('comunicazioni').orderBy('dataCreazione', 'desc').get()
+      .then(function (snapshot) {
+        var nonLette = [];
+        snapshot.forEach(function (doc) {
+          var com = doc.data();
+          var lettoDa = com.lettoDa || [];
+          if (lettoDa.indexOf(utenteCorrente.id) === -1) {
+            nonLette.push(com);
+          }
+        });
+
+        if (nonLette.length > 0) {
+          var html = '';
+          nonLette.forEach(function (com) {
+            html += '<div style="padding:8px 0; border-bottom:1px solid var(--border-color);">';
+            html += '  <strong>' + escapeHtml(com.titolo || 'Senza titolo') + '</strong>';
+            html += '  <div style="font-size:0.85rem; color:var(--text-secondary);">' + escapeHtml(com.autoreNome || '') + '</div>';
+            html += '</div>';
+          });
+          document.getElementById('popup-comunicazioni-lista').innerHTML = html;
+          document.getElementById('popup-comunicazioni').style.display = 'flex';
+        }
+      })
+      .catch(function (errore) {
+        console.log('Errore controllo comunicazioni non lette:', errore);
+      });
+  }
+
+  window.chiudiPopupComunicazioni = function () {
+    document.getElementById('popup-comunicazioni').style.display = 'none';
+  };
+  
 })();
