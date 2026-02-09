@@ -815,6 +815,15 @@ function renderCampagne() {
 
     // Webhook URL
     html += '<div class="campagna-webhook">';
+    
+    // Tipo integrazione badge + istruzioni
+    var integrLabel = { make: 'Make (Integromat)', zapier: 'Zapier', webhook: 'Webhook generico' };
+    var integrTipo = c.integrazione || 'webhook';
+    html += '<div style="display:flex; align-items:center; gap: var(--space-2); margin-bottom: var(--space-2);">';
+    html += '<label class="form-label" style="margin-bottom: 0;">Integrazione:</label>';
+    html += '<span class="badge badge-integrazione-' + integrTipo + '">' + (integrLabel[integrTipo] || integrTipo) + '</span>';
+    html += '</div>';
+    
     html += '<label class="form-label" style="margin-bottom: 4px;">URL Webhook</label>';
     html += '<div class="webhook-url-row">';
     html += '<input type="text" class="form-input webhook-url-input" value="' + escapeHtml(webhookUrl) + '" readonly id="webhook-url-' + c.id + '">';
@@ -823,6 +832,34 @@ function renderCampagne() {
     html += ' Copia';
     html += '</button>';
     html += '</div>';
+    
+    // Istruzioni specifiche per tipo integrazione
+    html += '<div class="integrazione-istruzioni">';
+    if (integrTipo === 'make') {
+      html += '<p><strong>Come configurare in Make:</strong></p>';
+      html += '<ol>';
+      html += '<li>Crea un nuovo Scenario in Make</li>';
+      html += '<li>Aggiungi il modulo della fonte lead (es. Facebook Lead Ads)</li>';
+      html += '<li>Aggiungi un modulo <strong>HTTP → Make a request</strong></li>';
+      html += '<li>URL: incolla l\'URL webhook qui sopra</li>';
+      html += '<li>Metodo: <strong>POST</strong></li>';
+      html += '<li>Body: JSON con i campi <code>nome</code>, <code>cognome</code>, <code>telefono</code>, <code>email</code>, <code>provincia</code></li>';
+      html += '</ol>';
+    } else if (integrTipo === 'zapier') {
+      html += '<p><strong>Come configurare in Zapier:</strong></p>';
+      html += '<ol>';
+      html += '<li>Crea un nuovo Zap in Zapier</li>';
+      html += '<li>Trigger: scegli la fonte lead (es. Facebook Lead Ads)</li>';
+      html += '<li>Action: scegli <strong>Webhooks by Zapier → POST</strong></li>';
+      html += '<li>URL: incolla l\'URL webhook qui sopra</li>';
+      html += '<li>Payload Type: <strong>JSON</strong></li>';
+      html += '<li>Mappa i campi: <code>nome</code>, <code>cognome</code>, <code>telefono</code>, <code>email</code>, <code>provincia</code></li>';
+      html += '</ol>';
+    } else {
+      html += '<p><strong>Webhook generico:</strong> Invia una richiesta <strong>POST</strong> a questo URL con un body JSON contenente i campi <code>nome</code>, <code>cognome</code>, <code>telefono</code>, <code>email</code>, <code>provincia</code>.</p>';
+    }
+    html += '</div>';
+    
     html += '</div>';
 
     // Distribuzione riepilogo
@@ -888,6 +925,7 @@ function apriModaleModificaCampagna(campagnaId) {
   document.getElementById('campagna-id').value = c.id;
   document.getElementById('campagna-nome').value = c.nome || '';
   document.getElementById('campagna-fonte').value = c.fonte || '';
+  document.getElementById('campagna-integrazione').value = c.integrazione || 'webhook';
   document.getElementById('modale-campagna').style.display = 'flex';
 }
 
@@ -900,8 +938,9 @@ async function salvaCampagna() {
   var id = document.getElementById('campagna-id').value;
   var nome = document.getElementById('campagna-nome').value.trim();
   var fonte = document.getElementById('campagna-fonte').value;
+  var integrazione = document.getElementById('campagna-integrazione').value;
 
-  if (!nome || !fonte) {
+  if (!nome || !fonte || !integrazione) {
     mostraToast('Compila tutti i campi obbligatori', 'error');
     return;
   }
@@ -921,6 +960,7 @@ async function salvaCampagna() {
       await db.collection('campagne').add({
         nome: nome,
         fonte: fonte,
+        integrazione: integrazione,
         attiva: true,
         distribuzione: distribuzione,
         contatori: contatori,
@@ -932,7 +972,8 @@ async function salvaCampagna() {
       // --- MODIFICA ---
       await db.collection('campagne').doc(id).update({
         nome: nome,
-        fonte: fonte
+        fonte: fonte,
+        integrazione: integrazione
       });
 
       mostraToast('Campagna aggiornata con successo', 'success');
