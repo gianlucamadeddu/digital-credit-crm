@@ -4354,3 +4354,56 @@ textarea.form-input {
     display: none;
   }
 }
+
+/* ============ DASHBOARD — RICHIESTE BO ============ */
+
+.richiesta-bo-dash-item {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-3) 0;
+  border-bottom: 1px solid var(--border-color);
+  transition: background 0.15s ease;
+}
+
+.richiesta-bo-dash-item:last-child {
+  border-bottom: none;
+}
+
+.richiesta-bo-dash-item:hover {
+  background: var(--hover-bg);
+  margin: 0 calc(var(--space-3) * -1);
+  padding-left: var(--space-3);
+  padding-right: var(--space-3);
+  border-radius: 8px;
+}
+
+.richiesta-bo-dash-left {
+  flex: 1;
+  min-width: 0;
+}
+
+.richiesta-bo-dash-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.richiesta-bo-dash-cliente {
+  font-weight: var(--font-medium);
+  font-size: var(--text-sm);
+  color: var(--text-primary);
+}
+
+.richiesta-bo-dash-dettaglio {
+  font-size: var(--text-xs);
+  color: var(--text-secondary);
+}
+
+.richiesta-bo-dash-nota {
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+  margin-top: 2px;
+  line-height: 1.4;
+}
