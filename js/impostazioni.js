@@ -3,7 +3,7 @@
 // ============================================================
 
 // --- Variabili globali ---
-let db;
+// NOTA: 'db' è già dichiarato in firebase-config.js, non lo ridichiariamo
 let utenti = [];
 let stati = [];
 let campagne = [];
@@ -32,8 +32,7 @@ document.addEventListener('DOMContentLoaded', async function () {
   if (elNome) elNome.textContent = utente.nome + ' ' + utente.cognome;
   if (elRuolo) elRuolo.textContent = utente.ruolo;
 
-  // Inizializza Firestore
-  db = firebase.firestore();
+  // Firestore è già inizializzato da firebase-config.js (variabile globale 'db')
 
   // Inizializza tab
   inizializzaTab();
