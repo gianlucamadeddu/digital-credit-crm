@@ -458,3 +458,31 @@ async function distribuisciLead(campagnaId) {
 
   return consulenteScelto;
 }
+
+// =====================================================
+// AGGIUNTE A utils.js — Copia queste funzioni nel tuo file utils.js esistente
+// =====================================================
+
+/**
+ * Sostituisce le variabili nel testo con i dati del lead e del consulente.
+ * Usata sia nei template messaggi che nel dettaglio lead.
+ * 
+ * @param {string} testo - Testo con variabili tipo {NOME}, {COGNOME}, ecc.
+ * @param {Object} lead - Oggetto lead con i dati
+ * @param {string} consulente - Nome completo del consulente
+ * @returns {string} Testo con variabili sostituite
+ */
+function sostituisciVariabili(testo, lead, consulente) {
+  if (!testo) return '';
+  
+  return testo
+    .replace(/{NOME}/g, lead.nome || '')
+    .replace(/{COGNOME}/g, lead.cognome || '')
+    .replace(/{NOME_COMPLETO}/g, ((lead.nome || '') + ' ' + (lead.cognome || '')).trim())
+    .replace(/{TELEFONO}/g, lead.telefono || '')
+    .replace(/{EMAIL}/g, lead.email || '')
+    .replace(/{PROVINCIA}/g, lead.provincia || '')
+    .replace(/{AUTO_RICHIESTA}/g, lead.autoRichiesta || '')
+    .replace(/{BUDGET}/g, lead.budgetMensile || '')
+    .replace(/{CONSULENTE}/g, consulente || '');
+}
