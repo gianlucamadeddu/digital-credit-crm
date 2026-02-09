@@ -417,6 +417,7 @@
               <option value="tiktok">TikTok</option>
               <option value="landing">Landing Page</option>
               <option value="manuale">Manuale</option>
+              <option value="database">Database (Import Excel)</option>
             </select>
           </div>
           <div class="form-group">
@@ -454,6 +455,97 @@
     </div>
   </div>
 
+  <!-- ============ MODALE IMPORT EXCEL ============ -->
+  <div class="modal-overlay" id="modale-import-excel" style="display:none;">
+    <div class="modal" style="max-width: 700px;">
+      <div class="modal-header">
+        <h3 class="modal-title">Importa Lead da Excel</h3>
+        <button class="modal-close" id="chiudi-modale-import">&times;</button>
+      </div>
+      <div class="modal-body">
+        <!-- Step 1: Upload file -->
+        <div id="import-step-upload">
+          <div class="import-info-box">
+            <p><strong>Formato richiesto:</strong> File Excel (.xlsx) con queste colonne:</p>
+            <div class="import-colonne-grid">
+              <span class="import-col import-col-obbligatorio">Nome *</span>
+              <span class="import-col import-col-obbligatorio">Cognome *</span>
+              <span class="import-col import-col-obbligatorio">Telefono *</span>
+              <span class="import-col">Email</span>
+              <span class="import-col">Provincia</span>
+              <span class="import-col">Note</span>
+            </div>
+            <p class="text-muted" style="font-size: var(--text-xs); margin-top: var(--space-2);">* Campi obbligatori. La prima riga deve contenere le intestazioni.</p>
+          </div>
+
+          <div class="import-upload-area" id="import-upload-area">
+            <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            <p><strong>Trascina qui il file Excel</strong></p>
+            <p class="text-muted" style="font-size: var(--text-sm);">oppure</p>
+            <button class="btn btn-secondary" id="btn-seleziona-file">Seleziona file</button>
+            <input type="file" id="input-file-excel" accept=".xlsx,.xls" style="display:none;">
+          </div>
+
+          <div style="text-align: center; margin-top: var(--space-3);">
+            <button class="btn btn-secondary btn-sm" id="btn-scarica-template">
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              Scarica Template Excel
+            </button>
+          </div>
+        </div>
+
+        <!-- Step 2: Anteprima -->
+        <div id="import-step-anteprima" style="display:none;">
+          <div class="import-riepilogo">
+            <span class="import-riepilogo-item">
+              <strong id="import-totale-righe">0</strong> righe trovate
+            </span>
+            <span class="import-riepilogo-item import-riepilogo-ok">
+              <strong id="import-righe-valide">0</strong> valide
+            </span>
+            <span class="import-riepilogo-item import-riepilogo-errore">
+              <strong id="import-righe-errore">0</strong> con errori
+            </span>
+          </div>
+
+          <div class="import-campagna-info" id="import-campagna-info"></div>
+
+          <div class="table-responsive" style="max-height: 300px; overflow-y: auto;">
+            <table class="table" id="tabella-anteprima-import">
+              <thead>
+                <tr>
+                  <th style="width:30px;">#</th>
+                  <th>Nome</th>
+                  <th>Cognome</th>
+                  <th>Telefono</th>
+                  <th>Email</th>
+                  <th>Provincia</th>
+                  <th>Stato</th>
+                </tr>
+              </thead>
+              <tbody id="tbody-anteprima-import"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Step 3: Importazione in corso -->
+        <div id="import-step-progress" style="display:none;">
+          <div class="import-progress-container">
+            <div class="import-progress-bar" id="import-progress-bar" style="width: 0%;"></div>
+          </div>
+          <p class="import-progress-text" id="import-progress-text">Importazione in corso...</p>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" id="btn-annulla-import">Annulla</button>
+        <button class="btn btn-primary" id="btn-conferma-import" disabled>
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/></svg>
+          Importa Lead
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- Toast -->
   <div class="toast-container" id="toast-container"></div>
 
@@ -462,6 +554,7 @@
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <script src="js/firebase-config.js"></script>
   <script src="js/auth.js"></script>
   <script src="js/utils.js"></script>
