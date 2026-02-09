@@ -106,7 +106,16 @@
             <option value="mese" selected>Questo mese</option>
             <option value="trimestre">Ultimo trimestre</option>
             <option value="anno">Quest'anno</option>
+            <option value="personalizzato">Personalizzato...</option>
           </select>
+
+          <!-- Date personalizzate (visibili solo se "Personalizzato") -->
+          <div class="date-range-group" id="date-range-group" style="display:none;">
+            <label class="date-range-label">Da</label>
+            <input type="date" class="form-input toolbar-date" id="filtro-data-da">
+            <label class="date-range-label">A</label>
+            <input type="date" class="form-input toolbar-date" id="filtro-data-a">
+          </div>
 
           <!-- Filtro Stato -->
           <select class="form-input toolbar-select" id="filtro-stato">
