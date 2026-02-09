@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Webhook - Digital Credit</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      background: #FFFFFF;
+      color: #1F2937;
+    }
+    .container {
+      text-align: center;
+      padding: 2rem;
+      max-width: 500px;
+    }
+    .icon {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+    }
+    .icon.success { color: #10B981; }
+    .icon.error { color: #EF4444; }
+    .icon.loading { color: #6B7280; }
+    .message {
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+    .detail {
+      font-size: 0.875rem;
+      color: #6B7280;
+      word-break: break-all;
+    }
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 4px solid #E5E7EB;
+      border-top-color: #3B82F6;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin: 0 auto 1rem;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container" id="container">
+    <div class="spinner"></div>
+    <div class="message">Elaborazione in corso...</div>
+  </div>
+
+  <!-- Firebase CDN -->
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+
+  <script>
+    // ==========================================
+    // CONFIGURAZIONE FIREBASE
+    // ==========================================
+    const firebaseConfig = {
+      apiKey: "AIzaSyDld3qTWe5tgyL2vzI6NPU9GiGUDlQwnHY",
+      authDomain: "digital-credit-crm.firebaseapp.com",
+      projectId: "digital-credit-crm",
+      storageBucket: "digital-credit-crm.firebasestorage.app",
+      messagingSenderId: "112506542200",
+      appId: "1:112506542200:web:e55e3b3b10372eb55cb58d"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    // ==========================================
+    // FUNZIONI UI
+    // ==========================================
+    function mostraSuccesso(messaggio, dettaglio) {
+      document.getElementById('container').innerHTML = `
+        <div class="icon success">✓</div>
+        <div class="message">${messaggio}</div>
+        ${dettaglio ? `<div class="detail">${dettaglio}</div>` : ''}
+      `;
+    }
+
+    function mostraErrore(messaggio, dettaglio) {
+      document.getElementById('container').innerHTML = `
+        <div class="icon error">✗</div>
+        <div class="message">${messaggio}</div>
+        ${dettaglio ? `<div class="detail">${dettaglio}</div>` : ''}
+      `;
+    }
+
+    // ==========================================
+    // ALGORITMO DISTRIBUZIONE ROUND-ROBIN PESATO
+    // ==========================================
+    async function distribuisciLead(campagnaId) {
+      const campagnaRef = db.collection('campagne').doc(campagnaId);
+      const campagnaDoc = await campagnaRef.get();
+
+      if (!campagnaDoc.exists) {
+        throw new Error('Campagna non trovata');
+      }
+
+      const campagna = campagnaDoc.data();
+      const distribuzione = campagna.distribuzione || {};
+      const contatori = campagna.contatori || {};
+
+      // Calcola il totale dei lead assegnati finora
+      let totaleAssegnati = 0;
+      for (const id in contatori) {
+        totaleAssegnati += contatori[id] || 0;
+      }
+
+      // Per ogni consulente, calcola la differenza tra % attesa e % effettiva
+      let consulenteScelto = null;
+      let maxDifferenza = -Infinity;
+
+      for (const consulenteId in distribuzione) {
+        const percentualeAttesa = distribuzione[consulenteId];
+
+        // Salta se percentuale è 0
+        if (percentualeAttesa <= 0) continue;
+
+        // Verifica che il consulente sia attivo
+        const consulenteDoc = await db.collection('utenti').doc(consulenteId).get();
+        if (!consulenteDoc.exists || !consulenteDoc.data().attivo) continue;
+
+        // Calcola percentuale effettiva
+        const leadAssegnati = contatori[consulenteId] || 0;
+        const percentualeEffettiva = totaleAssegnati > 0
+          ? (leadAssegnati / totaleAssegnati) * 100
+          : 0;
+
+        // Differenza: chi è più "indietro" rispetto alla sua quota ha priorità
+        const differenza = percentualeAttesa - percentualeEffettiva;
+
+        if (differenza > maxDifferenza) {
+          maxDifferenza = differenza;
+          consulenteScelto = consulenteId;
+        }
+      }
+
+      // Caso speciale: primo lead o nessun consulente attivo trovato
+      if (!consulenteScelto) {
+        let maxPercentuale = 0;
+        for (const consulenteId in distribuzione) {
+          if (distribuzione[consulenteId] > maxPercentuale) {
+            // Verifica anche qui che sia attivo
+            const consulenteDoc = await db.collection('utenti').doc(consulenteId).get();
+            if (consulenteDoc.exists && consulenteDoc.data().attivo) {
+              maxPercentuale = distribuzione[consulenteId];
+              consulenteScelto = consulenteId;
+            }
+          }
+        }
+      }
+
+      if (!consulenteScelto) {
+        throw new Error('Nessun consulente attivo trovato per questa campagna');
+      }
+
+      // Aggiorna il contatore
+      const nuovoContatore = (contatori[consulenteScelto] || 0) + 1;
+      await campagnaRef.update({
+        [`contatori.${consulenteScelto}`]: nuovoContatore
+      });
+
+      return consulenteScelto;
+    }
+
+    // ==========================================
+    // LOGICA PRINCIPALE
+    // ==========================================
+    async function elaboraWebhook() {
+      try {
+        // 1. Leggi i parametri dall'URL
+        const params = new URLSearchParams(window.location.search);
+        const nome = (params.get('nome') || '').trim();
+        const cognome = (params.get('cognome') || '').trim();
+        const telefono = (params.get('telefono') || '').trim();
+        const email = (params.get('email') || '').trim();
+        const provincia = (params.get('provincia') || '').trim();
+        const note = (params.get('note') || '').trim();
+        const campagnaId = (params.get('campagna') || '').trim();
+        const token = (params.get('token') || '').trim();
+
+        // 2. Validazione campi obbligatori
+        if (!nome || !cognome || !telefono || !campagnaId) {
+          mostraErrore(
+            'Errore: dati mancanti',
+            `Campi obbligatori: nome${!nome ? ' ✗' : ' ✓'}, cognome${!cognome ? ' ✗' : ' ✓'}, telefono${!telefono ? ' ✗' : ' ✓'}, campagna${!campagnaId ? ' ✗' : ' ✓'}`
+          );
+          return;
+        }
+
+        if (!token) {
+          mostraErrore('Errore: token mancante', 'Il parametro token è obbligatorio');
+          return;
+        }
+
+        // 3. Trova la campagna in Firestore
+        const campagnaDoc = await db.collection('campagne').doc(campagnaId).get();
+
+        if (!campagnaDoc.exists) {
+          mostraErrore('Errore: campagna non trovata', `ID campagna: ${campagnaId}`);
+          return;
+        }
+
+        const campagna = campagnaDoc.data();
+
+        // 4. Verifica token di sicurezza
+        if (campagna.token !== token) {
+          mostraErrore('Errore: token non valido', 'Il token di sicurezza non corrisponde');
+          return;
+        }
+
+        // 5. Verifica che la campagna sia attiva
+        if (!campagna.attiva) {
+          mostraErrore('Errore: campagna non attiva', `La campagna "${campagna.nome}" è disattivata`);
+          return;
+        }
+
+        // 6. Distribuisci il lead a un consulente
+        const consulenteId = await distribuisciLead(campagnaId);
+
+        if (!consulenteId) {
+          mostraErrore('Errore: nessun consulente disponibile', 'Nessun consulente attivo per questa campagna');
+          return;
+        }
+
+        // 7. Salva il lead in Firestore
+        const leadData = {
+          nome: nome,
+          cognome: cognome,
+          telefono: telefono,
+          email: email || '',
+          provincia: provincia || '',
+          fonte: campagna.fonte || 'manuale',
+          campagna: campagnaId,
+          consulenteId: consulenteId,
+          stato: 'nuovo',
+          fase: 'contatto',
+          priorita: 'media',
+          tipoCliente: '',
+          autoRichiesta: '',
+          budgetMensile: '',
+          durataDesiderata: '',
+          kmAnnui: '',
+          tempiDesiderati: '',
+          noteEsigenza: note || '',
+          tags: [],
+          dataCreazione: firebase.firestore.FieldValue.serverTimestamp(),
+          dataUltimaModifica: firebase.firestore.FieldValue.serverTimestamp(),
+          dataChiusura: null
+        };
+
+        const leadRef = await db.collection('lead').add(leadData);
+
+        // 8. Crea record nella timeline
+        await db.collection('lead').doc(leadRef.id).collection('timeline').add({
+          tipo: 'creazione',
+          nota: 'Lead creato automaticamente da campagna: ' + (campagna.nome || campagnaId),
+          autoreId: 'sistema',
+          autoreNome: 'Sistema automatico',
+          timestamp: firebase.firestore.FieldValue.serverTimestamp()
+        });
+
+        // 9. Mostra successo
+        // Recupera nome consulente per il messaggio
+        let nomeConsulente = consulenteId;
+        try {
+          const consDoc = await db.collection('utenti').doc(consulenteId).get();
+          if (consDoc.exists) {
+            const cons = consDoc.data();
+            nomeConsulente = cons.nome + ' ' + cons.cognome;
+          }
+        } catch (e) { /* ignora */ }
+
+        mostraSuccesso(
+          'Lead ricevuto con successo',
+          `ID: ${leadRef.id} | Assegnato a: ${nomeConsulente} | ${nome} ${cognome}`
+        );
+
+      } catch (errore) {
+        console.error('Errore webhook:', errore);
+        mostraErrore('Errore di sistema', errore.message);
+      }
+    }
+
+    // Avvia elaborazione al caricamento della pagina
+    elaboraWebhook();
+  </script>
+</body>
+</html>
