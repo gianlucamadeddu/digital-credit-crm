@@ -131,6 +131,17 @@ function inizializzaEventi() {
   document.getElementById('select-campagna-assegnazione').addEventListener('change', onCampagnaAssegnazioneChange);
   document.getElementById('btn-salva-distribuzione').addEventListener('click', salvaDistribuzione);
 
+  // --- Import Excel ---
+  document.getElementById('chiudi-modale-import').addEventListener('click', chiudiModaleImport);
+  document.getElementById('btn-annulla-import').addEventListener('click', chiudiModaleImport);
+  document.getElementById('btn-conferma-import').addEventListener('click', eseguiImportExcel);
+  document.getElementById('btn-seleziona-file').addEventListener('click', function () {
+    document.getElementById('input-file-excel').click();
+  });
+  document.getElementById('input-file-excel').addEventListener('change', onFileExcelSelezionato);
+  document.getElementById('btn-scarica-template').addEventListener('click', scaricaTemplateExcel);
+  inizializzaDragDropExcel();
+
   // --- Conferma generica ---
   document.getElementById('chiudi-modale-conferma').addEventListener('click', chiudiModaleConferma);
   document.getElementById('btn-annulla-conferma').addEventListener('click', chiudiModaleConferma);
@@ -214,14 +225,16 @@ function getBadgeFonte(fonte) {
     google: 'badge-fonte-google',
     tiktok: 'badge-fonte-tiktok',
     landing: 'badge-fonte-landing',
-    manuale: 'badge-fonte-manuale'
+    manuale: 'badge-fonte-manuale',
+    database: 'badge-fonte-database'
   };
   var nomi = {
     meta: 'Meta',
     google: 'Google',
     tiktok: 'TikTok',
     landing: 'Landing',
-    manuale: 'Manuale'
+    manuale: 'Manuale',
+    database: 'Database'
   };
   return '<span class="badge ' + (classi[fonte] || '') + '">' + (nomi[fonte] || fonte) + '</span>';
 }
@@ -915,6 +928,12 @@ function renderCampagne() {
 
     // Bottone configura distribuzione
     html += '<div class="campagna-footer">';
+    if (c.fonte === 'database') {
+      html += '<button class="btn btn-primary" onclick="apriModaleImportExcel(\'' + c.id + '\')" style="margin-right: var(--space-2);">';
+      html += '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>';
+      html += ' Importa Excel';
+      html += '</button>';
+    }
     html += '<button class="btn btn-secondary" onclick="vaiAssegnazione(\'' + c.id + '\')">';
     html += '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>';
     html += ' Configura Distribuzione';
@@ -1260,6 +1279,410 @@ async function salvaDistribuzione() {
 // --- Modale conferma generica ---
 function chiudiModaleConferma() {
   document.getElementById('modale-conferma').style.display = 'none';
+}
+
+// ============================================================
+// IMPORT EXCEL
+// ============================================================
+
+var importCampagnaId = '';
+var importDatiValidi = [];
+var importDatiErrore = [];
+
+function apriModaleImportExcel(campagnaId) {
+  importCampagnaId = campagnaId;
+  importDatiValidi = [];
+  importDatiErrore = [];
+
+  // Reset UI
+  document.getElementById('import-step-upload').style.display = 'block';
+  document.getElementById('import-step-anteprima').style.display = 'none';
+  document.getElementById('import-step-progress').style.display = 'none';
+  document.getElementById('btn-conferma-import').disabled = true;
+  document.getElementById('btn-conferma-import').textContent = 'Importa Lead';
+  document.getElementById('btn-annulla-import').textContent = 'Annulla';
+  document.getElementById('btn-annulla-import').disabled = false;
+  document.getElementById('input-file-excel').value = '';
+
+  // Mostra info campagna
+  var c = campagne.find(function (ca) { return ca.id === campagnaId; });
+  if (c) {
+    document.getElementById('import-campagna-info').innerHTML =
+      '<strong>Campagna:</strong> ' + escapeHtml(c.nome) + ' &middot; ' + getBadgeFonte(c.fonte);
+  }
+
+  document.getElementById('modale-import-excel').style.display = 'flex';
+}
+
+function chiudiModaleImport() {
+  document.getElementById('modale-import-excel').style.display = 'none';
+  importCampagnaId = '';
+  importDatiValidi = [];
+  importDatiErrore = [];
+}
+
+// --- Drag & Drop area ---
+function inizializzaDragDropExcel() {
+  var area = document.getElementById('import-upload-area');
+  if (!area) return;
+
+  area.addEventListener('dragover', function (e) {
+    e.preventDefault();
+    area.classList.add('drag-over');
+  });
+
+  area.addEventListener('dragleave', function () {
+    area.classList.remove('drag-over');
+  });
+
+  area.addEventListener('drop', function (e) {
+    e.preventDefault();
+    area.classList.remove('drag-over');
+    var files = e.dataTransfer.files;
+    if (files.length > 0) {
+      processaFileExcel(files[0]);
+    }
+  });
+}
+
+function onFileExcelSelezionato(e) {
+  var file = e.target.files[0];
+  if (file) {
+    processaFileExcel(file);
+  }
+}
+
+// --- Leggi e parsa il file Excel ---
+function processaFileExcel(file) {
+  // Verifica estensione
+  var ext = file.name.split('.').pop().toLowerCase();
+  if (ext !== 'xlsx' && ext !== 'xls') {
+    mostraToast('Seleziona un file Excel (.xlsx o .xls)', 'error');
+    return;
+  }
+
+  var reader = new FileReader();
+  reader.onload = function (e) {
+    try {
+      var data = new Uint8Array(e.target.result);
+      var workbook = XLSX.read(data, { type: 'array' });
+
+      // Prendi il primo foglio
+      var primoFoglio = workbook.SheetNames[0];
+      var foglio = workbook.Sheets[primoFoglio];
+
+      // Converti in JSON
+      var righe = XLSX.utils.sheet_to_json(foglio, { defval: '' });
+
+      if (righe.length === 0) {
+        mostraToast('Il file è vuoto o non ha il formato corretto', 'error');
+        return;
+      }
+
+      // Parsa e valida
+      parsaRigheExcel(righe);
+    } catch (errore) {
+      console.error('Errore lettura Excel:', errore);
+      mostraToast('Errore nella lettura del file: ' + errore.message, 'error');
+    }
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+// --- Mappa colonne e valida ---
+function parsaRigheExcel(righe) {
+  importDatiValidi = [];
+  importDatiErrore = [];
+
+  // Mappa delle colonne (case-insensitive, supporta varianti)
+  var mappaColonne = {
+    nome: ['nome', 'name', 'first name', 'first_name', 'firstname'],
+    cognome: ['cognome', 'surname', 'last name', 'last_name', 'lastname'],
+    telefono: ['telefono', 'phone', 'tel', 'cellulare', 'mobile', 'numero'],
+    email: ['email', 'e-mail', 'mail'],
+    provincia: ['provincia', 'province', 'città', 'citta', 'city'],
+    note: ['note', 'notes', 'nota', 'commento', 'commenti']
+  };
+
+  // Trova le colonne nel file
+  var colonneFile = Object.keys(righe[0]);
+  var mappatura = {};
+
+  Object.keys(mappaColonne).forEach(function (campo) {
+    var varianti = mappaColonne[campo];
+    for (var i = 0; i < colonneFile.length; i++) {
+      var colLower = colonneFile[i].toLowerCase().trim();
+      if (varianti.indexOf(colLower) !== -1) {
+        mappatura[campo] = colonneFile[i];
+        break;
+      }
+    }
+  });
+
+  // Verifica colonne obbligatorie
+  if (!mappatura.nome || !mappatura.cognome || !mappatura.telefono) {
+    mostraToast('Colonne obbligatorie mancanti: servono almeno Nome, Cognome e Telefono', 'error');
+    return;
+  }
+
+  // Parsa ogni riga
+  righe.forEach(function (riga, index) {
+    var nome = String(riga[mappatura.nome] || '').trim();
+    var cognome = String(riga[mappatura.cognome] || '').trim();
+    var telefono = String(riga[mappatura.telefono] || '').trim();
+    var email = mappatura.email ? String(riga[mappatura.email] || '').trim() : '';
+    var provincia = mappatura.provincia ? String(riga[mappatura.provincia] || '').trim() : '';
+    var note = mappatura.note ? String(riga[mappatura.note] || '').trim() : '';
+
+    // Pulisci telefono (rimuovi spazi e caratteri non necessari)
+    telefono = telefono.replace(/[\s\-\.]/g, '');
+
+    var errori = [];
+    if (!nome) errori.push('Nome mancante');
+    if (!cognome) errori.push('Cognome mancante');
+    if (!telefono) errori.push('Telefono mancante');
+
+    var record = {
+      riga: index + 2, // +2 perché riga 1 = intestazioni, e indice parte da 0
+      nome: nome,
+      cognome: cognome,
+      telefono: telefono,
+      email: email,
+      provincia: provincia,
+      note: note,
+      errori: errori
+    };
+
+    if (errori.length === 0) {
+      importDatiValidi.push(record);
+    } else {
+      importDatiErrore.push(record);
+    }
+  });
+
+  // Mostra anteprima
+  mostraAnteprimaImport();
+}
+
+// --- Mostra anteprima dati ---
+function mostraAnteprimaImport() {
+  document.getElementById('import-step-upload').style.display = 'none';
+  document.getElementById('import-step-anteprima').style.display = 'block';
+
+  var totale = importDatiValidi.length + importDatiErrore.length;
+  document.getElementById('import-totale-righe').textContent = totale;
+  document.getElementById('import-righe-valide').textContent = importDatiValidi.length;
+  document.getElementById('import-righe-errore').textContent = importDatiErrore.length;
+
+  // Genera tabella anteprima (prima gli errori, poi i validi)
+  var tbody = document.getElementById('tbody-anteprima-import');
+  var html = '';
+
+  // Righe con errori
+  importDatiErrore.forEach(function (r) {
+    html += '<tr class="import-riga-errore">';
+    html += '<td>' + r.riga + '</td>';
+    html += '<td>' + escapeHtml(r.nome) + '</td>';
+    html += '<td>' + escapeHtml(r.cognome) + '</td>';
+    html += '<td>' + escapeHtml(r.telefono) + '</td>';
+    html += '<td>' + escapeHtml(r.email) + '</td>';
+    html += '<td>' + escapeHtml(r.provincia) + '</td>';
+    html += '<td><span class="badge badge-errore-import" title="' + escapeHtml(r.errori.join(', ')) + '">Errore</span></td>';
+    html += '</tr>';
+  });
+
+  // Righe valide (max 50 in anteprima)
+  var validePreview = importDatiValidi.slice(0, 50);
+  validePreview.forEach(function (r) {
+    html += '<tr>';
+    html += '<td>' + r.riga + '</td>';
+    html += '<td>' + escapeHtml(r.nome) + '</td>';
+    html += '<td>' + escapeHtml(r.cognome) + '</td>';
+    html += '<td>' + escapeHtml(r.telefono) + '</td>';
+    html += '<td>' + escapeHtml(r.email) + '</td>';
+    html += '<td>' + escapeHtml(r.provincia) + '</td>';
+    html += '<td><span class="badge badge-attivo">OK</span></td>';
+    html += '</tr>';
+  });
+
+  if (importDatiValidi.length > 50) {
+    html += '<tr><td colspan="7" class="text-muted" style="text-align:center; font-size: var(--text-sm);">... e altri ' + (importDatiValidi.length - 50) + ' lead</td></tr>';
+  }
+
+  tbody.innerHTML = html;
+
+  // Abilita bottone conferma solo se ci sono righe valide
+  document.getElementById('btn-conferma-import').disabled = importDatiValidi.length === 0;
+}
+
+// --- Esegui import in Firestore ---
+async function eseguiImportExcel() {
+  if (importDatiValidi.length === 0 || !importCampagnaId) return;
+
+  var btnConferma = document.getElementById('btn-conferma-import');
+  var btnAnnulla = document.getElementById('btn-annulla-import');
+  btnConferma.disabled = true;
+  btnConferma.textContent = 'Importazione...';
+  btnAnnulla.disabled = true;
+
+  // Mostra progress
+  document.getElementById('import-step-anteprima').style.display = 'none';
+  document.getElementById('import-step-progress').style.display = 'block';
+
+  var campagna = campagne.find(function (c) { return c.id === importCampagnaId; });
+  if (!campagna) {
+    mostraToast('Campagna non trovata', 'error');
+    chiudiModaleImport();
+    return;
+  }
+
+  var importati = 0;
+  var errori = 0;
+  var totale = importDatiValidi.length;
+
+  for (var i = 0; i < importDatiValidi.length; i++) {
+    var lead = importDatiValidi[i];
+
+    try {
+      // Assegna consulente con distribuzione round-robin
+      var consulenteId = assegnaLeadRoundRobin(campagna);
+
+      await db.collection('lead').add({
+        nome: lead.nome,
+        cognome: lead.cognome,
+        telefono: lead.telefono,
+        email: lead.email,
+        provincia: lead.provincia,
+        noteEsigenza: lead.note,
+        fonte: 'database',
+        campagna: importCampagnaId,
+        consulenteId: consulenteId,
+        stato: 'nuovo',
+        fase: 'contatto',
+        priorita: 'media',
+        tipoCliente: 'privato',
+        autoRichiesta: '',
+        budgetMensile: '',
+        durataDesiderata: null,
+        kmAnnui: null,
+        tempiDesiderati: '',
+        tags: [],
+        dataCreazione: firebase.firestore.FieldValue.serverTimestamp(),
+        dataUltimaModifica: firebase.firestore.FieldValue.serverTimestamp(),
+        dataChiusura: null
+      });
+
+      importati++;
+    } catch (err) {
+      console.error('Errore import riga ' + lead.riga + ':', err);
+      errori++;
+    }
+
+    // Aggiorna progress bar
+    var progresso = Math.round(((i + 1) / totale) * 100);
+    document.getElementById('import-progress-bar').style.width = progresso + '%';
+    document.getElementById('import-progress-text').textContent =
+      'Importati ' + (i + 1) + ' di ' + totale + '...';
+  }
+
+  // Aggiorna contatori campagna in Firestore
+  if (campagna.contatori) {
+    try {
+      await db.collection('campagne').doc(importCampagnaId).update({
+        contatori: campagna.contatori
+      });
+    } catch (e) {
+      console.error('Errore aggiornamento contatori:', e);
+    }
+  }
+
+  // Risultato finale
+  document.getElementById('import-progress-text').textContent =
+    'Completato! ' + importati + ' lead importati' + (errori > 0 ? ', ' + errori + ' errori' : '') + '.';
+  document.getElementById('import-progress-bar').style.width = '100%';
+
+  mostraToast(importati + ' lead importati con successo' + (errori > 0 ? ' (' + errori + ' errori)' : ''), importati > 0 ? 'success' : 'error');
+
+  // Aggiorna UI
+  btnAnnulla.disabled = false;
+  btnAnnulla.textContent = 'Chiudi';
+
+  // Ricarica campagne
+  await caricaCampagne();
+}
+
+// --- Round Robin pesato per assegnazione lead ---
+function assegnaLeadRoundRobin(campagna) {
+  var distribuzione = campagna.distribuzione || {};
+  var contatori = campagna.contatori || {};
+  var totaleContatori = 0;
+
+  // Calcola totale contatori
+  Object.keys(contatori).forEach(function (consId) {
+    totaleContatori += contatori[consId] || 0;
+  });
+
+  var miglioreConsulente = null;
+  var miglioreDifferenza = -Infinity;
+
+  Object.keys(distribuzione).forEach(function (consId) {
+    var percentualeAttesa = distribuzione[consId] || 0;
+    if (percentualeAttesa <= 0) return; // Escluso o 0%
+
+    var percentualeEffettiva = totaleContatori > 0
+      ? ((contatori[consId] || 0) / totaleContatori) * 100
+      : 0;
+
+    var differenza = percentualeAttesa - percentualeEffettiva;
+
+    if (differenza > miglioreDifferenza) {
+      miglioreDifferenza = differenza;
+      miglioreConsulente = consId;
+    }
+  });
+
+  // Se nessun consulente configurato, ritorna vuoto
+  if (!miglioreConsulente) {
+    // Fallback: primo consulente attivo
+    if (consulentiAttivi.length > 0) {
+      miglioreConsulente = consulentiAttivi[0].id;
+    } else {
+      return '';
+    }
+  }
+
+  // Incrementa contatore
+  if (!campagna.contatori) campagna.contatori = {};
+  campagna.contatori[miglioreConsulente] = (campagna.contatori[miglioreConsulente] || 0) + 1;
+
+  return miglioreConsulente;
+}
+
+// --- Scarica template Excel ---
+function scaricaTemplateExcel() {
+  var datiTemplate = [
+    { Nome: 'Mario', Cognome: 'Rossi', Telefono: '3331234567', Email: 'mario.rossi@email.com', Provincia: 'Roma', Note: 'Interessato a utilitaria' },
+    { Nome: 'Laura', Cognome: 'Bianchi', Telefono: '3339876543', Email: 'laura.bianchi@email.com', Provincia: 'Milano', Note: '' },
+    { Nome: '', Cognome: '', Telefono: '', Email: '', Provincia: '', Note: '' }
+  ];
+
+  var ws = XLSX.utils.json_to_sheet(datiTemplate);
+
+  // Imposta larghezza colonne
+  ws['!cols'] = [
+    { wch: 15 }, // Nome
+    { wch: 15 }, // Cognome
+    { wch: 15 }, // Telefono
+    { wch: 25 }, // Email
+    { wch: 15 }, // Provincia
+    { wch: 30 }  // Note
+  ];
+
+  var wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Lead');
+  XLSX.writeFile(wb, 'template_import_lead.xlsx');
+
+  mostraToast('Template scaricato', 'success');
 }
 
 // ============================================================
