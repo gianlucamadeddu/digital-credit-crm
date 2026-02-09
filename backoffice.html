@@ -178,12 +178,19 @@
           <div class="form-row">
             <div class="form-group">
               <label class="form-label">Rata Mensile (€) *</label>
-              <input type="number" class="form-input" id="contratto-rata" required placeholder="299">
+              <input type="number" class="form-input" id="contratto-rata" required placeholder="299" oninput="calcolaValoreContratto()">
             </div>
             <div class="form-group">
               <label class="form-label">Durata (mesi) *</label>
-              <input type="number" class="form-input" id="contratto-durata" required placeholder="36">
+              <input type="number" class="form-input" id="contratto-durata" required placeholder="36" oninput="calcolaValoreContratto()">
             </div>
+          </div>
+
+          <!-- Valore Contratto calcolato automaticamente -->
+          <div class="form-group">
+            <label class="form-label">Valore Contratto</label>
+            <div class="valore-contratto-display" id="contratto-valore">€0</div>
+            <small style="color: var(--text-secondary);">Calcolato automaticamente: rata × durata</small>
           </div>
 
           <div class="form-row">
@@ -199,8 +206,8 @@
 
           <div class="form-row">
             <div class="form-group">
-              <label class="form-label">Provvigione Consulente (€)</label>
-              <input type="number" class="form-input" id="contratto-provvigione" placeholder="350">
+              <label class="form-label">Provvigione Consulente (€) *</label>
+              <input type="number" class="form-input" id="contratto-provvigione" placeholder="350" required>
             </div>
             <div class="form-group">
               <label class="form-label">Fornitore NLT</label>
