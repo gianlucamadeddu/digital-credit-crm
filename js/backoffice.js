@@ -612,6 +612,10 @@ function praticaCompletata(leadId, consulenteId) {
   document.getElementById('contratto-lead-id').value = leadId;
   document.getElementById('contratto-consulente-id').value = consulenteId;
 
+  // Reset valore contratto
+  var valoreEl = document.getElementById('contratto-valore');
+  if (valoreEl) valoreEl.textContent = '€0';
+
   // Apri modale
   document.getElementById('modal-contratto').style.display = 'flex';
 }
@@ -622,6 +626,24 @@ function chiudiModaleContratto() {
   praticaCorrenteConsulenteId = null;
 }
 
+// =============================================
+// CALCOLO AUTOMATICO VALORE CONTRATTO
+// =============================================
+
+function calcolaValoreContratto() {
+  var rata = parseFloat(document.getElementById('contratto-rata').value) || 0;
+  var durata = parseInt(document.getElementById('contratto-durata').value) || 0;
+  var valore = rata * durata;
+  var valoreEl = document.getElementById('contratto-valore');
+  if (valoreEl) {
+    valoreEl.textContent = '€' + valore.toLocaleString('it-IT');
+  }
+}
+
+// =============================================
+// SALVA CONTRATTO
+// =============================================
+
 async function salvaContratto() {
   var leadId = document.getElementById('contratto-lead-id').value;
   var consulenteId = document.getElementById('contratto-consulente-id').value;
@@ -631,10 +653,11 @@ async function salvaContratto() {
   var rata = document.getElementById('contratto-rata').value;
   var durata = document.getElementById('contratto-durata').value;
   var km = document.getElementById('contratto-km').value;
+  var provvigione = document.getElementById('contratto-provvigione').value;
 
-  // Validazione minima
-  if (!marca || !modello || !rata || !durata || !km) {
-    mostraToast('Compila i campi obbligatori (Marca, Modello, Rata, Durata, Km)', 'errore');
+  // Validazione campi obbligatori
+  if (!marca || !modello || !rata || !durata || !km || !provvigione) {
+    mostraToast('Compila i campi obbligatori (Marca, Modello, Rata, Durata, Km, Provvigione)', 'errore');
     return;
   }
 
@@ -656,7 +679,7 @@ async function salvaContratto() {
       durataMesi: parseInt(durata) || 0,
       kmAnnuiInclusi: parseInt(km) || 0,
       anticipo: parseFloat(document.getElementById('contratto-anticipo').value) || 0,
-      provvigioneConsulente: parseFloat(document.getElementById('contratto-provvigione').value) || 0,
+      provvigioneConsulente: parseFloat(provvigione) || 0,
       fornitoreNLT: document.getElementById('contratto-fornitore').value.trim(),
       numeroContratto: document.getElementById('contratto-numero').value.trim(),
       dataFirma: dataFirma ? firebase.firestore.Timestamp.fromDate(new Date(dataFirma)) : now,
@@ -678,7 +701,7 @@ async function salvaContratto() {
       .collection('timeline').add({
         tipo: 'cambio_stato',
         statoNew: 'venduto',
-        nota: 'Contratto registrato — ' + marca + ' ' + modello + ' | Rata: €' + rata + '/mese',
+        nota: 'Contratto registrato — ' + marca + ' ' + modello + ' | Rata: €' + rata + '/mese | Provvigione: €' + provvigione,
         autoreId: utenteCorrente.id,
         autoreNome: utenteCorrente.nome + ' ' + utenteCorrente.cognome,
         timestamp: now
