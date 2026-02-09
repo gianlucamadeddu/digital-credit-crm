@@ -3462,6 +3462,60 @@ textarea.form-input {
   color: #374151;
 }
 
+/* ============ BADGE INTEGRAZIONE ============ */
+
+.badge-integrazione-make {
+  background: #EDE9FE;
+  color: #6D28D9;
+}
+
+.badge-integrazione-zapier {
+  background: #FFF7ED;
+  color: #C2410C;
+}
+
+.badge-integrazione-webhook {
+  background: #F0F9FF;
+  color: #0369A1;
+}
+
+/* ============ ISTRUZIONI INTEGRAZIONE ============ */
+
+.integrazione-istruzioni {
+  margin-top: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  background: var(--bg-page);
+  border-radius: 8px;
+  font-size: var(--text-xs);
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.integrazione-istruzioni p {
+  margin: 0 0 var(--space-2) 0;
+}
+
+.integrazione-istruzioni strong {
+  color: var(--text-primary);
+}
+
+.integrazione-istruzioni ol {
+  margin: 0;
+  padding-left: var(--space-5);
+}
+
+.integrazione-istruzioni ol li {
+  margin-bottom: var(--space-1);
+}
+
+.integrazione-istruzioni code {
+  background: white;
+  padding: 1px 5px;
+  border-radius: 3px;
+  font-size: var(--text-xs);
+  border: 1px solid var(--border-color);
+}
+
 /* ============ BOTTONI ICONA ============ */
 
 .btn-icon {
@@ -4173,4 +4227,3 @@ textarea.form-input {
     display: none;
   }
 }
-
