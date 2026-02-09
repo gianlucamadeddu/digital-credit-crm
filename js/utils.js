@@ -355,3 +355,106 @@ function inizializzaSidebar() {
     }
   });
 }
+
+// ==========================================
+// DISTRIBUZIONE LEAD - Round-Robin Pesato
+// Aggiungi questo codice al tuo file utils.js
+// ==========================================
+
+/**
+ * Distribuisce un lead al consulente corretto secondo l'algoritmo round-robin pesato.
+ * 
+ * Come funziona:
+ * 1. Legge la distribuzione % e i contatori dalla campagna
+ * 2. Per ogni consulente ATTIVO, calcola la differenza tra % attesa e % effettiva
+ * 3. Assegna il lead al consulente più "indietro" rispetto alla sua quota
+ * 4. Aggiorna il contatore
+ * 
+ * Esempio: 
+ *   Se distribuzione = { A: 50%, B: 30%, C: 20% }
+ *   E contatori attuali = { A: 5, B: 4, C: 1 } (totale = 10)
+ *   Allora % effettive = { A: 50%, B: 40%, C: 10% }
+ *   Differenze = { A: 0%, B: -10%, C: +10% }
+ *   → Assegna a C (più indietro rispetto alla sua quota)
+ *
+ * @param {string} campagnaId - ID della campagna in Firestore
+ * @returns {Promise<string>} - ID del consulente a cui assegnare il lead
+ * @throws {Error} Se la campagna non esiste o nessun consulente è disponibile
+ */
+async function distribuisciLead(campagnaId) {
+  // 1. Leggi il documento della campagna
+  const campagnaRef = db.collection('campagne').doc(campagnaId);
+  const campagnaDoc = await campagnaRef.get();
+
+  if (!campagnaDoc.exists) {
+    throw new Error('Campagna non trovata');
+  }
+
+  const campagna = campagnaDoc.data();
+  const distribuzione = campagna.distribuzione || {};
+  const contatori = campagna.contatori || {};
+
+  // 2. Calcola il totale dei lead assegnati finora
+  let totaleAssegnati = 0;
+  for (const id in contatori) {
+    totaleAssegnati += contatori[id] || 0;
+  }
+
+  // 3. Per ogni consulente, calcola la differenza tra % attesa e % effettiva
+  let consulenteScelto = null;
+  let maxDifferenza = -Infinity;
+
+  for (const consulenteId in distribuzione) {
+    const percentualeAttesa = distribuzione[consulenteId];
+
+    // Salta se percentuale è 0 o negativa
+    if (percentualeAttesa <= 0) continue;
+
+    // Verifica che il consulente sia attivo in Firestore
+    const consulenteDoc = await db.collection('utenti').doc(consulenteId).get();
+    if (!consulenteDoc.exists || !consulenteDoc.data().attivo) continue;
+
+    // Calcola percentuale effettiva
+    const leadAssegnati = contatori[consulenteId] || 0;
+    const percentualeEffettiva = totaleAssegnati > 0
+      ? (leadAssegnati / totaleAssegnati) * 100
+      : 0;
+
+    // Calcola differenza: positiva = sotto quota (deve ricevere di più)
+    const differenza = percentualeAttesa - percentualeEffettiva;
+
+    // Scegli il consulente con la differenza maggiore
+    if (differenza > maxDifferenza) {
+      maxDifferenza = differenza;
+      consulenteScelto = consulenteId;
+    }
+  }
+
+  // 4. Caso speciale: primo lead (totale = 0) o nessun consulente trovato
+  if (!consulenteScelto) {
+    // Prendi il consulente attivo con la percentuale più alta
+    let maxPercentuale = 0;
+    for (const consulenteId in distribuzione) {
+      if (distribuzione[consulenteId] > maxPercentuale) {
+        const consulenteDoc = await db.collection('utenti').doc(consulenteId).get();
+        if (consulenteDoc.exists && consulenteDoc.data().attivo) {
+          maxPercentuale = distribuzione[consulenteId];
+          consulenteScelto = consulenteId;
+        }
+      }
+    }
+  }
+
+  // Se ancora nessuno trovato, errore
+  if (!consulenteScelto) {
+    throw new Error('Nessun consulente attivo trovato per questa campagna');
+  }
+
+  // 5. Aggiorna il contatore del consulente scelto
+  const nuovoContatore = (contatori[consulenteScelto] || 0) + 1;
+  await campagnaRef.update({
+    [`contatori.${consulenteScelto}`]: nuovoContatore
+  });
+
+  return consulenteScelto;
+}
