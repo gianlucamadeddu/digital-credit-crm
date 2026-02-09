@@ -1,0 +1,67 @@
+<!-- ====================================================
+     SNIPPET HTML per lead-elenco.html
+     ====================================================
+
+     ISTRUZIONI:
+     1. Aggiungi lo script SheetJS nel <head> o prima dei tuoi JS
+     2. Aggiungi il bottone nella toolbar
+     3. Aggiungi overlay e modale prima di </body>
+     ==================================================== -->
+
+
+<!-- =============================================
+     1. SCRIPT SHEETJS — Metti nel <head> o prima dei tuoi script
+     ============================================= -->
+<script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
+
+
+<!-- =============================================
+     2. BOTTONE EXPORT — Metti nella toolbar accanto a "+ Nuovo Lead"
+     ============================================= -->
+<button class="btn btn-secondary" id="btn-esporta-excel" title="Esporta lead in Excel">
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+    <polyline points="7 10 12 15 17 10"/>
+    <line x1="12" y1="15" x2="12" y2="3"/>
+  </svg>
+  Esporta Excel
+</button>
+
+
+<!-- =============================================
+     3. OVERLAY + MODALE — Metti prima di </body>
+     ============================================= -->
+
+<!-- Overlay caricamento export -->
+<div id="export-overlay" class="export-overlay" style="display:none;">
+  <div class="export-overlay-content">
+    <div class="export-spinner"></div>
+    <p>Generazione export in corso...</p>
+  </div>
+</div>
+
+<!-- Modale conferma export massivo (>5000 lead) -->
+<div id="modal-export-conferma" class="modal-overlay" style="display:none;">
+  <div class="modal-content" style="max-width:420px;">
+    <h3 style="margin-bottom:12px;">⚠️ Export massivo</h3>
+    <p id="export-conferma-testo" style="margin-bottom:20px;color:var(--text-secondary);"></p>
+    <div style="display:flex;gap:8px;justify-content:flex-end;">
+      <button class="btn btn-secondary" onclick="chiudiModaleExport()">Annulla</button>
+      <button class="btn btn-primary" onclick="confermaExport()">Continua</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- =============================================
+     4. INIZIALIZZAZIONE — Aggiungi nel tuo DOMContentLoaded
+     ============================================= -->
+<script>
+  // Aggiungi questa riga dentro il tuo DOMContentLoaded esistente:
+  // inizializzaExportExcel();
+  
+  // Oppure, se non hai un DOMContentLoaded su questa pagina:
+  document.addEventListener('DOMContentLoaded', function() {
+    inizializzaExportExcel();
+  });
+</script>
