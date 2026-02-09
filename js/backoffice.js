@@ -3,7 +3,6 @@
 // =============================================
 
 // Riferimenti globali
-const db = firebase.firestore();
 let utenteCorrente = null;
 
 // Dati in memoria
