@@ -5344,3 +5344,22 @@ textarea.form-input {
   border-radius: 12px;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
 }
+
+/* === DATE RANGE nella toolbar === */
+.date-range-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.date-range-label {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.toolbar-date {
+  width: 140px;
+  padding: 6px 10px;
+  font-size: 0.85rem;
+}
