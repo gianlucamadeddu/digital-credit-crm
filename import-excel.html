@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Importa Lead - Digital Credit</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    /* Stili specifici per import Excel */
+    .upload-zone {
+      border: 2px dashed var(--border-color);
+      border-radius: 12px;
+      padding: 3rem 2rem;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      background: var(--bg-card);
+      margin-bottom: 1.5rem;
+    }
+    .upload-zone:hover,
+    .upload-zone.drag-over {
+      border-color: var(--brand-primary);
+      background: #FEF2F2;
+    }
+    .upload-zone-icon {
+      width: 48px;
+      height: 48px;
+      margin: 0 auto 1rem;
+      color: var(--text-muted);
+    }
+    .upload-zone-text {
+      font-size: 1rem;
+      font-weight: 500;
+      color: var(--text-primary);
+      margin-bottom: 0.25rem;
+    }
+    .upload-zone-hint {
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+    }
+    .upload-zone input[type="file"] {
+      display: none;
+    }
+
+    .file-info {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.75rem 1rem;
+      background: #F0FDF4;
+      border: 1px solid #BBF7D0;
+      border-radius: 8px;
+      margin-bottom: 1.5rem;
+    }
+    .file-info-icon { color: #10B981; }
+    .file-info-name { font-weight: 500; flex: 1; }
+    .file-info-remove {
+      cursor: pointer;
+      color: var(--text-muted);
+      padding: 0.25rem;
+      border-radius: 4px;
+    }
+    .file-info-remove:hover { color: #EF4444; background: #FEE2E2; }
+
+    .preview-table-wrapper {
+      max-height: 400px;
+      overflow-y: auto;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      margin-bottom: 1.5rem;
+    }
+    .preview-table-wrapper .table th {
+      position: sticky;
+      top: 0;
+      z-index: 1;
+    }
+    .preview-table-wrapper .table td.errore {
+      background: #FEF2F2;
+      color: #991B1B;
+    }
+
+    .row-checkbox { width: 18px; height: 18px; cursor: pointer; accent-color: var(--brand-primary); }
+
+    .riepilogo {
+      display: flex;
+      gap: 1.5rem;
+      margin-bottom: 1.5rem;
+      flex-wrap: wrap;
+    }
+    .riepilogo-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.75rem 1.25rem;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 0.875rem;
+    }
+    .riepilogo-validi { background: #D1FAE5; color: #065F46; }
+    .riepilogo-errori { background: #FEE2E2; color: #991B1B; }
+    .riepilogo-totali { background: #DBEAFE; color: #1E40AF; }
+
+    .progress-container {
+      margin-bottom: 1.5rem;
+      display: none;
+    }
+    .progress-bar-bg {
+      width: 100%;
+      height: 12px;
+      background: #E5E7EB;
+      border-radius: 9999px;
+      overflow: hidden;
+    }
+    .progress-bar-fill {
+      height: 100%;
+      background: var(--brand-primary);
+      border-radius: 9999px;
+      transition: width 0.3s ease;
+      width: 0%;
+    }
+    .progress-text {
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+      margin-top: 0.5rem;
+      text-align: center;
+    }
+
+    .risultato-finale {
+      text-align: center;
+      padding: 2rem;
+      display: none;
+    }
+    .risultato-finale .icon {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+    }
+    .risultato-finale .icon.success { color: #10B981; }
+    .risultato-finale h3 { margin-bottom: 0.5rem; }
+    .risultato-finale p { color: var(--text-secondary); margin-bottom: 1.5rem; }
+
+    .istruzioni-box {
+      background: #F8FAFC;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 1.25rem;
+      margin-bottom: 1.5rem;
+    }
+    .istruzioni-box h4 {
+      font-size: 0.875rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      color: var(--text-primary);
+    }
+    .istruzioni-box p, .istruzioni-box li {
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+    .istruzioni-box ul {
+      padding-left: 1.25rem;
+      margin-top: 0.25rem;
+    }
+
+    .step-indicator {
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+      margin-bottom: 1.5rem;
+    }
+    .step {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.875rem;
+      color: var(--text-muted);
+    }
+    .step.active { color: var(--brand-primary); font-weight: 600; }
+    .step.completed { color: #10B981; }
+    .step-num {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+      font-weight: 700;
+      background: #E5E7EB;
+      color: var(--text-muted);
+    }
+    .step.active .step-num { background: var(--brand-primary); color: #fff; }
+    .step.completed .step-num { background: #10B981; color: #fff; }
+    .step-line {
+      width: 40px;
+      height: 2px;
+      background: #E5E7EB;
+    }
+  </style>
+</head>
+<body>
+  <div class="app-container">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-logo">
+        <img src="assets/logo.png" alt="Digital Credit" style="height: 120px; width: auto; padding: 10px; background: white; border-radius: 8px;">
+      </div>
+
+      <div class="sidebar-section-title">Menu Principale</div>
+
+      <nav class="sidebar-nav">
+        <a href="dashboard.html" class="sidebar-item">
+          <svg class="sidebar-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg>
+          <span>Dashboard</span>
+        </a>
+        <a href="lead-kanban.html" class="sidebar-item">
+          <svg class="sidebar-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          <span>Lead</span>
+        </a>
+        <a href="agenda.html" class="sidebar-item">
+          <svg class="sidebar-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>
+          <span>Appuntamenti</span>
+        </a>
+        <a href="comunicazioni.html" class="sidebar-item">
+          <svg class="sidebar-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
+          <span>Comunicazioni</span>
+        </a>
+        <a href="report.html" class="sidebar-item">
+          <svg class="sidebar-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" x2="12" y1="20" y2="10"/><line x1="18" x2="18" y1="20" y2="4"/><line x1="6" x2="6" y1="20" y2="16"/></svg>
+          <span>Report</span>
+        </a>
+      </nav>
+
+      <div class="sidebar-section-title">Amministrazione</div>
+
+      <nav class="sidebar-nav">
+        <a href="impostazioni.html" class="sidebar-item">
+          <svg class="sidebar-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
+          <span>Impostazioni</span>
+        </a>
+        <a href="import-excel.html" class="sidebar-item active">
+          <svg class="sidebar-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>
+          <span>Importa Lead</span>
+        </a>
+      </nav>
+
+      <!-- Utente in fondo alla sidebar -->
+      <div style="margin-top: auto; padding-top: 1.5rem; border-top: 1px solid rgba(255,255,255,0.1);">
+        <div style="display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem; color: var(--text-sidebar); font-size: 0.875rem;">
+          <div style="width: 32px; height: 32px; border-radius: 50%; background: var(--bg-sidebar-active); display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 0.75rem; color: #fff;" id="user-avatar">A</div>
+          <div style="flex: 1;">
+            <div style="font-weight: 500;" id="user-name">Admin</div>
+            <div style="font-size: 0.75rem; color: var(--text-muted);" id="user-role">Amministratore</div>
+          </div>
+          <svg onclick="logout()" style="cursor: pointer; opacity: 0.7;" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/></svg>
+        </div>
+      </div>
+    </aside>
+
+    <!-- CONTENUTO PRINCIPALE -->
+    <main class="main-content">
+
+      <!-- Header pagina -->
+      <header class="page-header">
+        <div style="display: flex; align-items: center; justify-content: space-between;">
+          <div>
+            <h1 class="page-title">Importa Lead da Excel</h1>
+            <p style="font-size: 0.875rem; color: var(--text-secondary); margin-top: 0.25rem;">Carica un file Excel o CSV per importare lead in blocco</p>
+          </div>
+          <a href="lead-kanban.html" class="btn btn-secondary">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
+            Vai ai Lead
+          </a>
+        </div>
+      </header>
+
+      <!-- Contenuto -->
+      <div class="page-content">
+
+        <!-- Step Indicator -->
+        <div class="step-indicator" id="step-indicator">
+          <div class="step active" id="step-1">
+            <span class="step-num">1</span>
+            <span>Carica File</span>
+          </div>
+          <div class="step-line"></div>
+          <div class="step" id="step-2">
+            <span class="step-num">2</span>
+            <span>Anteprima</span>
+          </div>
+          <div class="step-line"></div>
+          <div class="step" id="step-3">
+            <span class="step-num">3</span>
+            <span>Importa</span>
+          </div>
+        </div>
+
+        <!-- STEP 1: Configurazione e Upload -->
+        <div id="sezione-upload">
+
+          <!-- Istruzioni -->
+          <div class="istruzioni-box">
+            <h4>📋 Istruzioni</h4>
+            <p>Il file deve contenere queste colonne (la prima riga deve essere l'intestazione):</p>
+            <ul>
+              <li><strong>Nome</strong> (obbligatorio)</li>
+              <li><strong>Cognome</strong> (obbligatorio)</li>
+              <li><strong>Telefono</strong> (obbligatorio)</li>
+              <li><strong>Email</strong> (opzionale)</li>
+              <li><strong>Provincia</strong> (opzionale)</li>
+              <li><strong>Note</strong> (opzionale)</li>
+            </ul>
+            <p style="margin-top: 0.5rem;">
+              <a href="#" onclick="scaricaTemplate(); return false;" style="color: var(--brand-primary); font-weight: 500; text-decoration: none;">
+                📥 Scarica template Excel
+              </a>
+            </p>
+          </div>
+
+          <!-- Selezione Campagna -->
+          <div class="card" style="margin-bottom: 1.5rem;">
+            <div class="form-group" style="margin-bottom: 0;">
+              <label class="form-label">Assegna i lead alla campagna:</label>
+              <select class="form-input form-select" id="select-campagna">
+                <option value="">— Seleziona una campagna —</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Zona Upload -->
+          <div class="upload-zone" id="upload-zone" onclick="document.getElementById('file-input').click();">
+            <input type="file" id="file-input" accept=".xlsx,.xls,.csv">
+            <svg class="upload-zone-icon" xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>
+            <div class="upload-zone-text">Trascina qui il file oppure clicca per selezionarlo</div>
+            <div class="upload-zone-hint">Formati accettati: .xlsx, .xls, .csv</div>
+          </div>
+
+          <!-- File selezionato -->
+          <div id="file-info" style="display: none;" class="file-info">
+            <svg class="file-info-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>
+            <span class="file-info-name" id="file-name"></span>
+            <span class="file-info-remove" onclick="rimuoviFile()" title="Rimuovi file">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" x2="6" y1="6" y2="18"/><line x1="6" x2="18" y1="6" y2="18"/></svg>
+            </span>
+          </div>
+        </div>
+
+        <!-- STEP 2: Anteprima -->
+        <div id="sezione-anteprima" style="display: none;">
+
+          <div class="card" style="margin-bottom: 1.5rem;">
+
+            <!-- Riepilogo -->
+            <div class="riepilogo" id="riepilogo">
+              <div class="riepilogo-item riepilogo-totali">
+                <span>📊 Totali:</span>
+                <span id="totale-righe">0</span>
+              </div>
+              <div class="riepilogo-item riepilogo-validi">
+                <span>✓ Validi:</span>
+                <span id="totale-validi">0</span>
+              </div>
+              <div class="riepilogo-item riepilogo-errori">
+                <span>✗ Errori:</span>
+                <span id="totale-errori">0</span>
+              </div>
+            </div>
+
+            <!-- Tabella anteprima -->
+            <div class="preview-table-wrapper">
+              <table class="table" id="tabella-anteprima">
+                <thead>
+                  <tr>
+                    <th style="width: 40px;"><input type="checkbox" class="row-checkbox" id="seleziona-tutti" checked></th>
+                    <th style="width: 40px;">#</th>
+                    <th>Nome</th>
+                    <th>Cognome</th>
+                    <th>Telefono</th>
+                    <th>Email</th>
+                    <th>Provincia</th>
+                    <th>Note</th>
+                    <th style="width: 100px;">Stato</th>
+                  </tr>
+                </thead>
+                <tbody id="anteprima-body">
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Azioni -->
+            <div style="display: flex; gap: 0.75rem; justify-content: flex-end; margin-top: 1rem;">
+              <button class="btn btn-secondary" onclick="tornaUpload()">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
+                Indietro
+              </button>
+              <button class="btn btn-primary" id="btn-importa" onclick="avviaImportazione()">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>
+                Importa Lead
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- STEP 3: Progresso e Risultato -->
+        <div id="sezione-importazione" style="display: none;">
+          <div class="card">
+            <!-- Progress bar -->
+            <div class="progress-container" id="progress-container" style="display: block;">
+              <div style="font-weight: 600; margin-bottom: 0.75rem; text-align: center;">Importazione in corso...</div>
+              <div class="progress-bar-bg">
+                <div class="progress-bar-fill" id="progress-bar"></div>
+              </div>
+              <div class="progress-text" id="progress-text">0 / 0 lead importati</div>
+            </div>
+
+            <!-- Risultato finale -->
+            <div class="risultato-finale" id="risultato-finale">
+              <div class="icon success">✓</div>
+              <h3 id="risultato-titolo">Importazione completata</h3>
+              <p id="risultato-dettaglio"></p>
+              <div style="display: flex; gap: 0.75rem; justify-content: center;">
+                <button class="btn btn-secondary" onclick="resetPagina()">Importa altri</button>
+                <a href="lead-kanban.html" class="btn btn-primary">Vai alla Kanban</a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </main>
+
+  </div>
+
+  <!-- Toast notifiche -->
+  <div id="toast-container" style="position: fixed; top: 1rem; right: 1rem; z-index: 9999;"></div>
+
+  <!-- Firebase CDN -->
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+
+  <!-- SheetJS per leggere Excel -->
+  <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
+
+  <!-- Script progetto -->
+  <script src="js/firebase-config.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/import-excel.js"></script>
+</body>
+</html>
