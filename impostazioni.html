@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Impostazioni - Digital Credit</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="app-container">
+
+    <!-- ============ SIDEBAR ============ -->
+    <aside class="sidebar">
+      <div class="sidebar-logo">
+        <img src="assets/logo.png" alt="Digital Credit" style="height: 120px; width: auto; padding: 10px; background: white; border-radius: 8px;">
+      </div>
+
+      <div class="sidebar-section-title">Menu Principale</div>
+
+      <nav class="sidebar-nav">
+        <a href="dashboard.html" class="sidebar-item">
+          <svg class="sidebar-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>
+          <span>Dashboard</span>
+        </a>
+        <a href="lead-kanban.html" class="sidebar-item">
+          <svg class="sidebar-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          <span>Lead</span>
+        </a>
+        <a href="agenda.html" class="sidebar-item">
+          <svg class="sidebar-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          <span>Appuntamenti</span>
+        </a>
+        <a href="template-messaggi.html" class="sidebar-item">
+          <svg class="sidebar-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          <span>Template Messaggi</span>
+        </a>
+        <a href="comunicazioni.html" class="sidebar-item">
+          <svg class="sidebar-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+          <span>Comunicazioni</span>
+          <span class="badge-notification" id="badge-comunicazioni" style="display:none;">0</span>
+        </a>
+        <a href="report.html" class="sidebar-item">
+          <svg class="sidebar-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+          <span>Report</span>
+        </a>
+      </nav>
+
+      <div class="sidebar-section-title">Amministrazione</div>
+
+      <nav class="sidebar-nav">
+        <a href="backoffice.html" class="sidebar-item" id="menu-backoffice">
+          <svg class="sidebar-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+          <span>Back Office</span>
+        </a>
+        <a href="impostazioni.html" class="sidebar-item active">
+          <svg class="sidebar-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          <span>Impostazioni</span>
+        </a>
+      </nav>
+
+      <!-- Utente loggato + Logout -->
+      <div class="sidebar-user">
+        <div class="sidebar-user-info">
+          <span class="sidebar-user-name" id="sidebar-user-nome">Admin</span>
+          <span class="sidebar-user-role" id="sidebar-user-ruolo">admin</span>
+        </div>
+        <button class="sidebar-logout" id="btn-logout" title="Logout">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        </button>
+      </div>
+    </aside>
+
+    <!-- ============ CONTENUTO PRINCIPALE ============ -->
+    <main class="main-content">
+
+      <!-- Header pagina -->
+      <header class="page-header">
+        <h1 class="page-title">Impostazioni</h1>
+      </header>
+
+      <!-- Tab Navigation -->
+      <div class="tabs-container">
+        <div class="tabs-nav">
+          <button class="tab-btn active" data-tab="utenti">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            Gestione Utenti
+          </button>
+          <button class="tab-btn" data-tab="stati">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+            Stati Lead
+          </button>
+          <button class="tab-btn" data-tab="campagne">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+            Campagne
+          </button>
+          <button class="tab-btn" data-tab="assegnazione">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+            Assegnazione Lead
+          </button>
+        </div>
+      </div>
+
+      <!-- Contenuto Tab -->
+      <div class="page-content">
+
+        <!-- ========== TAB 1: GESTIONE UTENTI ========== -->
+        <div class="tab-content active" id="tab-utenti">
+          <div class="tab-header">
+            <h2 class="section-title">Gestione Utenti</h2>
+            <button class="btn btn-primary" id="btn-nuovo-utente">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              Nuovo Utente
+            </button>
+          </div>
+
+          <div class="card">
+            <div class="table-responsive">
+              <table class="table" id="tabella-utenti">
+                <thead>
+                  <tr>
+                    <th>Nome</th>
+                    <th>Cognome</th>
+                    <th>Username</th>
+                    <th>Email</th>
+                    <th>Ruolo</th>
+                    <th>Stato</th>
+                    <th>Azioni</th>
+                  </tr>
+                </thead>
+                <tbody id="tbody-utenti">
+                  <!-- Righe generate dinamicamente -->
+                </tbody>
+              </table>
+            </div>
+            <!-- Empty state -->
+            <div class="empty-state" id="empty-utenti" style="display:none;">
+              <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+              <p>Nessun utente trovato</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- ========== TAB 2: STATI LEAD ========== -->
+        <div class="tab-content" id="tab-stati">
+          <div class="tab-header">
+            <h2 class="section-title">Stati Lead</h2>
+            <button class="btn btn-primary" id="btn-nuovo-stato">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              Nuovo Stato
+            </button>
+          </div>
+
+          <div class="card">
+            <p class="text-muted" style="margin-bottom: var(--space-4); font-size: var(--text-sm);">Trascina gli stati per cambiare l'ordine. L'ordine si riflette nella vista Kanban.</p>
+            <div class="stati-list" id="lista-stati">
+              <!-- Righe generate dinamicamente -->
+            </div>
+            <div class="empty-state" id="empty-stati" style="display:none;">
+              <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+              <p>Nessuno stato configurato</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- ========== TAB 3: CAMPAGNE ========== -->
+        <div class="tab-content" id="tab-campagne">
+          <div class="tab-header">
+            <h2 class="section-title">Campagne</h2>
+            <button class="btn btn-primary" id="btn-nuova-campagna">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              Nuova Campagna
+            </button>
+          </div>
+
+          <div class="campagne-grid" id="lista-campagne">
+            <!-- Card campagne generate dinamicamente -->
+          </div>
+          <div class="empty-state" id="empty-campagne" style="display:none;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+            <p>Nessuna campagna configurata</p>
+          </div>
+        </div>
+
+        <!-- ========== TAB 4: ASSEGNAZIONE LEAD ========== -->
+        <div class="tab-content" id="tab-assegnazione">
+          <div class="tab-header">
+            <h2 class="section-title">Assegnazione Lead</h2>
+          </div>
+
+          <div class="card" style="margin-bottom: var(--space-4);">
+            <div class="form-group" style="margin-bottom: 0;">
+              <label class="form-label">Seleziona Campagna</label>
+              <select class="form-input form-select" id="select-campagna-assegnazione">
+                <option value="">— Scegli una campagna —</option>
+              </select>
+            </div>
+          </div>
+
+          <div id="assegnazione-container" style="display:none;">
+            <div class="consulenti-grid" id="lista-consulenti-assegnazione">
+              <!-- Card consulenti generate dinamicamente -->
+            </div>
+
+            <!-- Totale distribuzione -->
+            <div class="card distribuzione-totale" id="distribuzione-totale">
+              <div class="distribuzione-barra-container">
+                <div class="distribuzione-barra" id="distribuzione-barra" style="width: 0%;"></div>
+              </div>
+              <p class="distribuzione-messaggio" id="distribuzione-messaggio">Seleziona una campagna per configurare la distribuzione.</p>
+            </div>
+
+            <div style="text-align: right; margin-top: var(--space-4);">
+              <button class="btn btn-primary" id="btn-salva-distribuzione" disabled>
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+                Salva Distribuzione
+              </button>
+            </div>
+          </div>
+
+          <div class="empty-state" id="empty-assegnazione">
+            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/></svg>
+            <p>Seleziona una campagna per configurare la distribuzione dei lead</p>
+          </div>
+        </div>
+
+      </div><!-- fine page-content -->
+    </main>
+
+  </div><!-- fine app-container -->
+
+  <!-- ============ MODALE UTENTE (Crea / Modifica) ============ -->
+  <div class="modal-overlay" id="modale-utente" style="display:none;">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 class="modal-title" id="modale-utente-titolo">Nuovo Utente</h3>
+        <button class="modal-close" id="chiudi-modale-utente">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="form-utente">
+          <input type="hidden" id="utente-id" value="">
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Nome *</label>
+              <input type="text" class="form-input" id="utente-nome" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Cognome *</label>
+              <input type="text" class="form-input" id="utente-cognome" required>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Email *</label>
+              <input type="email" class="form-input" id="utente-email" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Telefono</label>
+              <input type="text" class="form-input" id="utente-telefono">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Username *</label>
+              <input type="text" class="form-input" id="utente-username" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" id="label-password">Password *</label>
+              <input type="password" class="form-input" id="utente-password" minlength="6">
+              <span class="form-hint" id="hint-password" style="display:none;">Lascia vuoto per mantenere la password attuale</span>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Ruolo *</label>
+            <select class="form-input form-select" id="utente-ruolo" required>
+              <option value="">— Seleziona ruolo —</option>
+              <option value="admin">Admin</option>
+              <option value="consulente">Consulente</option>
+              <option value="backoffice">Back Office</option>
+            </select>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" id="btn-annulla-utente">Annulla</button>
+        <button class="btn btn-primary" id="btn-conferma-utente">Crea Utente</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ MODALE RESET PASSWORD ============ -->
+  <div class="modal-overlay" id="modale-reset-password" style="display:none;">
+    <div class="modal modal-sm">
+      <div class="modal-header">
+        <h3 class="modal-title">Reset Password</h3>
+        <button class="modal-close" id="chiudi-modale-reset">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p id="reset-password-messaggio" style="margin-bottom: var(--space-4);">Sei sicuro di voler resettare la password?</p>
+        <input type="hidden" id="reset-utente-id" value="">
+        <div class="form-group">
+          <label class="form-label">Nuova Password *</label>
+          <input type="password" class="form-input" id="reset-nuova-password" minlength="6" required>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" id="btn-annulla-reset">Annulla</button>
+        <button class="btn btn-primary" id="btn-conferma-reset">Conferma Reset</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ MODALE STATO (Crea / Modifica) ============ -->
+  <div class="modal-overlay" id="modale-stato" style="display:none;">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 class="modal-title" id="modale-stato-titolo">Nuovo Stato</h3>
+        <button class="modal-close" id="chiudi-modale-stato">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="form-stato">
+          <input type="hidden" id="stato-id-originale" value="">
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Nome Stato *</label>
+              <input type="text" class="form-input" id="stato-nome" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Colore *</label>
+              <div class="color-picker-wrapper">
+                <input type="color" class="form-color" id="stato-colore" value="#3B82F6">
+                <span class="color-hex" id="stato-colore-hex">#3B82F6</span>
+              </div>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Fase *</label>
+            <select class="form-input form-select" id="stato-fase" required>
+              <option value="">— Seleziona fase —</option>
+              <option value="contatto">Contatto</option>
+              <option value="analisi">Analisi</option>
+              <option value="backoffice">Back Office</option>
+              <option value="trattativa">Trattativa</option>
+              <option value="preventivo">Preventivo</option>
+              <option value="perfezionamento">Perfezionamento</option>
+              <option value="chiusura">Chiusura</option>
+            </select>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" id="btn-annulla-stato">Annulla</button>
+        <button class="btn btn-primary" id="btn-conferma-stato">Crea Stato</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ MODALE ELIMINA STATO ============ -->
+  <div class="modal-overlay" id="modale-elimina-stato" style="display:none;">
+    <div class="modal modal-sm">
+      <div class="modal-header">
+        <h3 class="modal-title">Elimina Stato</h3>
+        <button class="modal-close" id="chiudi-modale-elimina-stato">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p>Sei sicuro di voler eliminare lo stato <strong id="elimina-stato-nome"></strong>?</p>
+        <p class="text-muted" style="margin-top: var(--space-2); font-size: var(--text-sm);">I lead in questo stato verranno spostati a "Nuovo".</p>
+        <input type="hidden" id="elimina-stato-id" value="">
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" id="btn-annulla-elimina-stato">Annulla</button>
+        <button class="btn btn-danger" id="btn-conferma-elimina-stato">Elimina</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ MODALE CAMPAGNA (Crea / Modifica) ============ -->
+  <div class="modal-overlay" id="modale-campagna" style="display:none;">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 class="modal-title" id="modale-campagna-titolo">Nuova Campagna</h3>
+        <button class="modal-close" id="chiudi-modale-campagna">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="form-campagna">
+          <input type="hidden" id="campagna-id" value="">
+          <div class="form-group">
+            <label class="form-label">Nome Campagna *</label>
+            <input type="text" class="form-input" id="campagna-nome" required placeholder="Es: Meta - Gennaio 2025">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Fonte *</label>
+            <select class="form-input form-select" id="campagna-fonte" required>
+              <option value="">— Seleziona fonte —</option>
+              <option value="meta">Meta (Facebook/Instagram)</option>
+              <option value="google">Google Ads</option>
+              <option value="tiktok">TikTok</option>
+              <option value="landing">Landing Page</option>
+              <option value="manuale">Manuale</option>
+            </select>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" id="btn-annulla-campagna">Annulla</button>
+        <button class="btn btn-primary" id="btn-conferma-campagna">Crea Campagna</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ MODALE CONFERMA GENERICA ============ -->
+  <div class="modal-overlay" id="modale-conferma" style="display:none;">
+    <div class="modal modal-sm">
+      <div class="modal-header">
+        <h3 class="modal-title" id="conferma-titolo">Conferma</h3>
+        <button class="modal-close" id="chiudi-modale-conferma">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p id="conferma-messaggio">Sei sicuro?</p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" id="btn-annulla-conferma">Annulla</button>
+        <button class="btn btn-primary" id="btn-conferma-azione">Conferma</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <!-- Scripts -->
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+  <script src="js/firebase-config.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/impostazioni.js"></script>
+</body>
+</html>
