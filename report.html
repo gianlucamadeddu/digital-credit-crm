@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Report - Digital Credit</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="app-container">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-logo">
+        <img src="assets/logo.png" alt="Digital Credit" style="height: 120px; width: auto; padding: 10px; background: white; border-radius: 8px;">
+      </div>
+
+      <div class="sidebar-section-title">Menu Principale</div>
+
+      <nav class="sidebar-nav">
+        <a href="dashboard.html" class="sidebar-item">
+          <svg class="sidebar-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>
+          <span>Dashboard</span>
+        </a>
+        <a href="lead-kanban.html" class="sidebar-item">
+          <svg class="sidebar-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          <span>Lead</span>
+        </a>
+        <a href="backoffice.html" class="sidebar-item" id="sidebar-backoffice" style="display:none;">
+          <svg class="sidebar-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><line x1="10" y1="9" x2="8" y2="9"/></svg>
+          <span>Back Office</span>
+        </a>
+        <a href="agenda.html" class="sidebar-item">
+          <svg class="sidebar-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          <span>Appuntamenti</span>
+        </a>
+        <a href="comunicazioni.html" class="sidebar-item">
+          <svg class="sidebar-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+          <span>Comunicazioni</span>
+          <span class="badge-notification" id="sidebar-badge-comunicazioni" style="display:none;">0</span>
+        </a>
+        <a href="report.html" class="sidebar-item active">
+          <svg class="sidebar-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+          <span>Report</span>
+        </a>
+      </nav>
+
+      <div class="sidebar-section-title" id="sidebar-admin-section" style="display:none;">Amministrazione</div>
+
+      <nav class="sidebar-nav">
+        <a href="impostazioni.html" class="sidebar-item" id="sidebar-impostazioni" style="display:none;">
+          <svg class="sidebar-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          <span>Impostazioni</span>
+        </a>
+      </nav>
+
+      <div class="sidebar-user">
+        <div class="sidebar-user-info">
+          <span class="sidebar-user-name" id="sidebar-user-name">Utente</span>
+          <span class="sidebar-user-role" id="sidebar-user-role">Ruolo</span>
+        </div>
+        <button class="btn-icon sidebar-logout" id="btn-logout" title="Logout">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        </button>
+      </div>
+    </aside>
+
+    <!-- CONTENUTO PRINCIPALE -->
+    <main class="main-content">
+
+      <!-- Header pagina -->
+      <header class="page-header">
+        <h1 class="page-title">Report</h1>
+      </header>
+
+      <!-- Barra filtri -->
+      <div class="report-filtri">
+        <div class="filtri-row">
+          <div class="filtro-gruppo">
+            <label class="form-label">Da</label>
+            <input type="date" class="form-input" id="filtro-data-da">
+          </div>
+          <div class="filtro-gruppo">
+            <label class="form-label">A</label>
+            <input type="date" class="form-input" id="filtro-data-a">
+          </div>
+          <div class="filtro-gruppo" id="filtro-consulente-container" style="display:none;">
+            <label class="form-label">Consulente</label>
+            <select class="form-input form-select" id="filtro-consulente">
+              <option value="">Tutti</option>
+            </select>
+          </div>
+          <div class="filtro-gruppo">
+            <label class="form-label">Campagna</label>
+            <select class="form-input form-select" id="filtro-campagna">
+              <option value="">Tutte</option>
+            </select>
+          </div>
+          <div class="filtro-gruppo filtro-btn-gruppo">
+            <button class="btn btn-primary" id="btn-genera-report">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+              Genera Report
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab navigazione -->
+      <div class="report-tabs">
+        <button class="report-tab active" data-tab="performance">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+          Performance
+        </button>
+        <button class="report-tab" data-tab="statistiche">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+          Statistiche e Valori
+        </button>
+        <button class="report-tab" data-tab="attivita">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          Attività Giornaliere
+        </button>
+      </div>
+
+      <!-- Contenuto -->
+      <div class="page-content">
+
+        <!-- TAB 1: PERFORMANCE -->
+        <div class="report-tab-content active" id="tab-performance">
+          <div class="report-3col">
+
+            <!-- Colonna 1: Performance Individuale -->
+            <div class="card">
+              <div class="section-header">
+                <svg class="section-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></svg>
+                <h2 class="section-title">Performance Individuale</h2>
+              </div>
+              <div class="perf-stats">
+                <div class="perf-stat-item">
+                  <span class="perf-stat-icon">🎯</span>
+                  <div class="perf-stat-info">
+                    <span class="perf-stat-label">Lead Recuperati</span>
+                    <span class="perf-stat-value" id="perf-lead-recuperati">0</span>
+                  </div>
+                </div>
+                <div class="perf-stat-item">
+                  <span class="perf-stat-icon">📞</span>
+                  <div class="perf-stat-info">
+                    <span class="perf-stat-label">Chiamate nel periodo</span>
+                    <span class="perf-stat-value" id="perf-chiamate">0</span>
+                  </div>
+                </div>
+                <div class="perf-stat-item">
+                  <span class="perf-stat-icon">⏱️</span>
+                  <div class="perf-stat-info">
+                    <span class="perf-stat-label">Tempo Medio Recupero</span>
+                    <span class="perf-stat-value" id="perf-tempo-medio">- giorni</span>
+                  </div>
+                </div>
+                <div class="perf-stat-item">
+                  <span class="perf-stat-icon">🏆</span>
+                  <div class="perf-stat-info">
+                    <span class="perf-stat-label">Best Day Performance</span>
+                    <span class="perf-stat-value" id="perf-best-day">-</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Colonna 2: Stato Pipeline -->
+            <div class="card">
+              <div class="section-header">
+                <svg class="section-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+                <h2 class="section-title">Stato Pipeline</h2>
+              </div>
+              <div id="pipeline-stati" class="pipeline-stati">
+                <!-- Generato dinamicamente -->
+              </div>
+              <div class="insights-box" id="insights-box" style="display:none;">
+                <h4 class="insights-title">💡 Insights</h4>
+                <div id="insights-list"></div>
+              </div>
+            </div>
+
+            <!-- Colonna 3: Trend Settimanali -->
+            <div class="card">
+              <div class="section-header">
+                <svg class="section-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+                <h2 class="section-title">Trend Settimanali</h2>
+              </div>
+              <div id="trend-settimanale" class="trend-settimanale">
+                <!-- Generato dinamicamente -->
+              </div>
+              <div class="obiettivo-box" id="obiettivo-box">
+                <h4 class="obiettivo-title">🚀 Obiettivo Settimanale</h4>
+                <div class="obiettivo-info">
+                  <span id="obiettivo-testo">Obiettivo: 80 chiamate</span>
+                  <div class="obiettivo-barra-container">
+                    <div class="obiettivo-barra" id="obiettivo-barra" style="width: 0%"></div>
+                  </div>
+                  <span class="obiettivo-progresso" id="obiettivo-progresso">0/80</span>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- TAB 2: STATISTICHE E VALORI -->
+        <div class="report-tab-content" id="tab-statistiche">
+
+          <!-- 4 Widget grandi -->
+          <div class="widget-grid">
+            <div class="card card-widget">
+              <div class="card-widget-icon blue">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+              </div>
+              <div>
+                <div class="card-widget-number" id="stat-lead-totali">0</div>
+                <div class="card-widget-label">Lead Totali</div>
+              </div>
+            </div>
+            <div class="card card-widget">
+              <div class="card-widget-icon green">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+              </div>
+              <div>
+                <div class="card-widget-number" id="stat-contratti-chiusi">0</div>
+                <div class="card-widget-label">Contratti Chiusi</div>
+              </div>
+            </div>
+            <div class="card card-widget">
+              <div class="card-widget-icon yellow">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+              </div>
+              <div>
+                <div class="card-widget-number" id="stat-valore-contratti">€0</div>
+                <div class="card-widget-label">Valore Contratti</div>
+              </div>
+            </div>
+            <div class="card card-widget">
+              <div class="card-widget-icon red">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12V8H6a2 2 0 0 1-2-2c0-1.1.9-2 2-2h12v4"/><path d="M4 6v12c0 1.1.9 2 2 2h14v-4"/><path d="M18 12a2 2 0 0 0-2 2c0 1.1.9 2 2 2h4v-4h-4z"/></svg>
+              </div>
+              <div>
+                <div class="card-widget-number" id="stat-provvigioni">€0</div>
+                <div class="card-widget-label">Provvigioni Totali</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Grafici -->
+          <div class="report-2col">
+            <div class="card">
+              <div class="section-header">
+                <h2 class="section-title">Lead per Fonte</h2>
+              </div>
+              <div class="chart-container">
+                <canvas id="chart-fonti"></canvas>
+              </div>
+            </div>
+            <div class="card">
+              <div class="section-header">
+                <h2 class="section-title">Lead per Stato</h2>
+              </div>
+              <div class="chart-container">
+                <canvas id="chart-stati"></canvas>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tabella Performance Consulenti (solo Admin) -->
+          <div class="card" id="tabella-performance-container" style="display:none; margin-top: var(--space-6);">
+            <div class="section-header" style="justify-content: space-between;">
+              <div style="display:flex; align-items:center; gap: var(--space-2);">
+                <h2 class="section-title">Performance Consulenti</h2>
+              </div>
+              <button class="btn btn-secondary" id="btn-esporta-csv">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                Esporta CSV
+              </button>
+            </div>
+            <div style="overflow-x: auto;">
+              <table class="table" id="tabella-performance">
+                <thead>
+                  <tr>
+                    <th>Consulente</th>
+                    <th>Lead Assegnati</th>
+                    <th>Chiamate</th>
+                    <th>Contratti</th>
+                    <th>Tasso Conv.</th>
+                    <th>Valore Contratti</th>
+                    <th>Provvigioni</th>
+                  </tr>
+                </thead>
+                <tbody id="tabella-performance-body">
+                  <!-- Generato dinamicamente -->
+                </tbody>
+                <tfoot id="tabella-performance-footer">
+                  <!-- Totali -->
+                </tfoot>
+              </table>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- TAB 3: ATTIVITÀ GIORNALIERE -->
+        <div class="report-tab-content" id="tab-attivita">
+
+          <!-- Filtro aggiuntivo utente -->
+          <div class="card" style="margin-bottom: var(--space-4);" id="filtro-attivita-container">
+            <div class="filtri-row">
+              <div class="filtro-gruppo" id="filtro-attivita-utente-container" style="display:none;">
+                <label class="form-label">Utente</label>
+                <select class="form-input form-select" id="filtro-attivita-utente">
+                  <option value="">Tutti</option>
+                </select>
+              </div>
+              <div class="filtro-gruppo filtro-btn-gruppo">
+                <button class="btn btn-primary" id="btn-carica-attivita">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
+                  Aggiorna
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Timeline attività -->
+          <div id="attivita-timeline">
+            <div class="empty-state">
+              <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              <p>Clicca "Genera Report" per visualizzare le attività</p>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </main>
+
+  </div>
+
+  <!-- Toast notifiche -->
+  <div id="toast-container" class="toast-container"></div>
+
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="js/firebase-config.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/report.js"></script>
+</body>
+</html>
